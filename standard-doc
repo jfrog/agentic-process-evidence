@@ -1,0 +1,30 @@
+# Working notes (source)
+
+Goal, scope, and raw material for the agentic process evidence standard.
+
+**Entity definitions have been extracted to [`spec/`](./spec/).** Prefer those files for normative field tables and examples.
+
+---
+
+## Goal
+
+Allow governance to be applied on agentic processes that are related to SDLC flows, i.e. development, agentic code reviews, version release, and more, and support current regulatory requirements and standards.
+
+Through the binding of agentic processes information and content to the SDLC entities, we plan to allow:
+
+- Troubleshooting & monitoring agentic processes in the context of software development
+- Policy-as-code validation for processes provenance
+- Rapid human approval for what cannot be automated through policy as code
+
+We plan to suggest an evidence spec for agentic processes and a way to bind that into the software release process.
+
+## Scope
+
+Defines entities required for governance on agentic ADLC, including session logs and agentic sessions evidence.
+
+See the entity index: [`spec/README.md`](./spec/README.md).
+
+## Out of scope
+
+- Agents authentication methods and data
+- Intents analysis
