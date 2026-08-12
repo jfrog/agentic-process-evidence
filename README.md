@@ -1,7 +1,7 @@
 # Agentic Sessions Evidence Standard
 
 A proposed standard for **evidencing agentic processes**.
-With this standard we focus on any agentic process running as part of an SDLC (software development lifecycle) pipeline, such as code development, code review, version release, and other related processes effecting software release, but we do aknowledge the same evidence might fit other scenarios and welcome any use.
+All agentic processes can be documented using this standard. We focus examples on agentic processes running as part of an SDLC (software development lifecycle) pipeline — such as code development, code review, version release, and other related processes affecting software release, but the same evidence model applies to any agentic process, and we welcome use beyond SDLC.
 
 This repository defines how to bind agent session information to SDLC entities (commits, artifacts, application versions) so organizations can govern their AI-assisted work with the same rigor as traditional release process.
 
