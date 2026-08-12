@@ -1,4 +1,4 @@
-# Agentic Process Evidence Standard
+# Agentic Sessions Evidence Standard
 
 A proposed standard for **evidencing agentic processes**.
 With this standard we foicus on any agentic process running as part of an SDLC (software development lifecycle) pipeline, such as code development, code review, version release, and other related processes effecting software release, but we do aknowledge the same evidence might fit other scenarios and welcome any use.
