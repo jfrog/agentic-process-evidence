@@ -52,10 +52,10 @@ on commit:
                                                            │
 PR/build/other alignemnt check (optional)                  │
                                                            │
-┌──────────────────────────┐   referenced by               │
-│ Agentic alignment check  │  ─────────────────────────────┘
-│  on gitCommit.           │                  
-└───────────┬──────────────┘                  
+┌───────────────────────────┐   referenced by              │
+│ Agentic alignment check   │ ─────────────────────────────┘
+│ on session log/sdlc entity│                  
+└───────────┬───────────────┘                  
             │
             │ uploads evidence 
             ▼
@@ -136,11 +136,12 @@ The runtime tool should be active for every agentic SDLC flow you intend to gove
 
 #### 3.2. Alignment Violations evidence
 
-Runs at desired pipeline steps (Code Commit/PR review/release promotion) for agentically checking alignemnt of the developemnt process to organization policies and for flagging high-risk intents.
+Runs at desired pipeline steps (Code Commit/PR review/release promotion/other) for agentically checking alignemnt of an agnetic session (e.g. agentic development session) to the organization policies and for flagging high-risk intents.
 
 `predicateType`: `https://jfrog.com/evidence/agentic-alignment/v1` 
 This process collects existing relevant session logs (git commit/PR commits/application release session logs) compares session logs against an intent/policy resource(s) and records `ALIGNED` | `MISALIGNED` plus violation summaries. 
 The alignment evidence can then be used in policy checks for blocking a release or requiring additional approvals and oversight.
+The alignment evidence subject can be either the session log that was evaluation, or an SDLC entity such as a commit, pr, release or artifact based on the pipeline step its executed in and the intended usage.
 
 #### 3.3. PR Approval
 
@@ -183,7 +184,7 @@ We recommand signing the evidence using DSSE ([https://github.com/secure-systems
 
 ### Adopt in an organization
 
-1. **Pick subjects** — Start with `gitCommit` for development and review; extend to application release promotion or approval.
+1. **Pick subjects** — Start with `git commit` for development and review; extend to application release promotion or approval.
 2. **Instrument the runtime** — Ensure the agent harness emits a session timeline (hooks or equivalent) and the Agent runtime tool flushes logs + evidence appropreately (e.g. on commit for development process).
 3. **Store session logs as artifacts** — Attach scannable properties (`tools`, `agent`, `commit`, `session_id`) so you can find all sessions that used a compromised tool or flagged policy issue.
 4. **Publish AI Process evidence** — Sign and attach the in-toto statement to the commit.
@@ -191,7 +192,7 @@ We recommand signing the evidence using DSSE ([https://github.com/secure-systems
 6. **Route exceptions to humans** — Use `reviewers`, and when avaialble `intents` and `processSummary`, and session log URIs for rapid approval when policy cannot decide.
 7. **Retain** — Keep session logs and evidence at least as long as release is relevant.
 
-### Integrate in a pipeline (typical flow)
+### Integrate in a pipeline (typical flow example)
 
 ```text
 Agent session (IDE / CI)
@@ -202,9 +203,9 @@ Agent runtime tool  ──►  upload Session log artifact(s)
         │
         │  on commit
         ▼
-Build Agentic session evidence (subject = gitCommit)
+Build Agentic session evidence (subject = git commit)
         │
-        ├─► optional: Alignment evidence vs intents policy
+        ├─► optional: Alignment evidence vs intents policy (subject = session log artifact)
         │
         ▼
 Collect evidence of a release version
