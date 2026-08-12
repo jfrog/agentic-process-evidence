@@ -1,7 +1,7 @@
 # Agentic Sessions Evidence Standard
 
 A proposed standard for **evidencing agentic processes**.
-With this standard we foicus on any agentic process running as part of an SDLC (software development lifecycle) pipeline, such as code development, code review, version release, and other related processes effecting software release, but we do aknowledge the same evidence might fit other scenarios and welcome any use.
+With this standard we focus on any agentic process running as part of an SDLC (software development lifecycle) pipeline, such as code development, code review, version release, and other related processes effecting software release, but we do aknowledge the same evidence might fit other scenarios and welcome any use.
 
 This repository defines how to bind agent session information to SDLC entities (commits, artifacts, application versions) so organizations can govern their AI-assisted work with the same rigor as traditional release process.
 
@@ -15,7 +15,7 @@ Agentic tools (IDE agents, review bots, release assistants) change code and infl
 
 This introduces blind spots in SDLC where organizations have limited ability to identify and control these agentic processes or apply risk based decisions on how they are handled, and validated and also how they can be audited later on.   
 
-As agents take more roles, and as they become more independent, the ability for an organization to make sure its architecture and policies are preserved become a challenge. This project offers a way to bring that control and assurance back into software development. 
+As agents take more roles, and as they become more independent, the ability for an organization to make sure its architecture and policies are preserved becomes a challenge. This project offers a way to bring that control and assurance back into software development. 
 
 This standard enables:
 
@@ -24,8 +24,8 @@ This standard enables:
 | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Troubleshooting & monitoring** | Trace agent sessions back to the commit or release they affected and allow tracking logs in their correct context and for as long as they could be needed                   |
 | **Policy-as-code validation**    | Automatically check harnesses, models, tools, owners, and outcomes                                                                                                          |
-| **Human oversight**              | Allow optimization of human review to only when risk is identified or when a human oversight was missing from the process                                                   |
-| **Regulatory alignment**         | Persist process logs for retention windows (e.g. EU AI Act Art. 19: ≥ 6 months) in a way that they links themn to the development process, identify missing human oversight |
+| **Human oversight**              | Allow optimization of human review to only when risk is suspected or when a human oversight was missing from the process                                                   |
+| **Regulatory alignment**         | Persist process logs for retention windows (e.g. EU AI Act Art. 19: ≥ 6 months) in a way that links to the development process, identify missing human oversight |
 
 
 By attaching **in-toto-style evidence** to git commits, artifacts and application releases, agentic activity becomes first-class release provenance—collectable SLSA-style evidence.
@@ -176,7 +176,7 @@ We recommand signing the evidence using DSSE ([https://github.com/secure-systems
 - **contextArtifacts** — policies, guidelines, prior logs (uri and/or inline `data` + digest)  
 - **result**, **intents**, **processSummary** — to be used by automation gates and human review  
 - **owner** / **reviewers** — accountability and oversight  
-- **custom** — process-specific data (e.g. `baseCommit`, requirements issues, change profile)
+- **custom** — process-specific data (e.g. `baseCommit`, alignment information, requirements issues, change profile)
 
 ---
 
