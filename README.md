@@ -83,8 +83,10 @@ On Agentic PR review:
 
 The **agent session trace** relevant to the agentic session — prompts, tool uses, responses, timestamps.
 
+
 | Attribute                 | Guidance                                                                                           |
 | ------------------------- | -------------------------------------------------------------------------------------------------- |
+| **Schema**             | [Agentic session log](spec/agentic-session-log.md)  |
 | **Cardinality**           | Many session logs per commit; one commit per session log (the commit that session created/updated) |
 | **Type**                  | Generic artifact                                                                                   |
 | **Location**              | Persistent storage with search capabilities                                                        |
@@ -93,12 +95,11 @@ The **agent session trace** relevant to the agentic session — prompts, tool us
 | **Retention**             | Aligned to release retention (minimum of 6 months accoring to EU regulation for certain software)  |
 
 
+
 #### Relationships
 
 - Produced and uploaded by the [Agent runtime tool](spec/agent-runtime-tool.md) on commit
 - Referenced from AI Process evidence via `sessionsLogs[].uri` + `sessionsLogs[].digest`
-- Payload schema: [Agentic session log](spec/agentic-session-log.md)
-
 
 ### 2. Agentic Session evidence
 
@@ -107,7 +108,7 @@ The **agent session trace** relevant to the agentic session — prompts, tool us
 
 | Attribute         | Guidance                                                                                                                                                                        |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Schema**        | `https://in-toto.io/Statement/v1`                                                                                                                                               |
+| **Schema**        | [Agentic session eviednce](spec/agentic-session-evidence.md)                                                                                                                                                 |
 | **predicateType** | e.g. `https://jfrog.com/evidence/agentic-code-review`, `https://jfrog.com/evidence/agentic-dev-process`                                                                         |
 | **Contains**      | Provider (harness / agent / LLMs), session IDs, session logs, tools, context artifacts, result, intents, summary, owner, reviewers, timestamps and process relevant custom data |
 | **Used for**      | Provenance on the agentic process allowing for Policy checks and auditing                                                                                                       |
@@ -156,13 +157,13 @@ This process collects all relevant session logs generated in the review process 
 Evidence follows [in-toto Statement v1](https://in-toto.io/). Minimum subject + envelope:
 
 
-| Field                                | Role                                                                                |
-| ------------------------------------ | ----------------------------------------------------------------------------------- |
-| `subject[].uri` / `subject[].digest` | Immutable identity of the subject and a download link                               |
-| `_type`                              | `https://in-toto.io/Statement/v1`                                                   |
-| `predicateType`                      | Process kind (`agentic-dev-process`, `agentic-code-review`, `agentic-alignment`, …) |
-| `createdAt` / `createdBy`            | Freshness and creator identity                                                      |
-| `predicate.`*                        | See field tables in `[spec/agentic-session-evidence.md](./spec/agentic-session-evidence.md)`  |
+| Field                                | Role                                                                                         |
+| ------------------------------------ | -------------------------------------------------------------------------------------------- |
+| `subject[].uri` / `subject[].digest` | Immutable identity of the subject and a download link                                        |
+| `_type`                              | `https://in-toto.io/Statement/v1`                                                            |
+| `predicateType`                      | Process kind (`agentic-dev-process`, `agentic-code-review`, `agentic-alignment`, …)          |
+| `createdAt` / `createdBy`            | Freshness and creator identity                                                               |
+| `predicate.`*                        | See field tables in `[spec/agentic-session-evidence.md](./spec/agentic-session-evidence.md)` |
 
 
 We recommand signing the evidence using DSSE ([https://github.com/secure-systems-lab/dsse](https://github.com/secure-systems-lab/dsse)).
@@ -236,10 +237,10 @@ Policy engine + human review / audit drill-down
 ## Repository contents
 
 
-| Path                             | Description                                                                                                           |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `[spec/](./spec/)`               | Normative entities: session log, process log, AI process evidence, agent identifier, alignment evidence, runtime tool |
-| `[README.md](./README.md)`       | Orientation and adoption guide (this file)                                                                            |
+| Path                       | Description                                                                                                           |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `[spec/](./spec/)`         | Normative entities: session log, process log, AI process evidence, agent identifier, alignment evidence, runtime tool |
+| `[README.md](./README.md)` | Orientation and adoption guide (this file)                                                                            |
 
 
 ---
