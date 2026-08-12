@@ -20,12 +20,12 @@ As agents take more roles, and as they become more independent, the ability for 
 This standard enables:
 
 
-| Capability                       | What it unlocks                                                                                                                                                             |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Troubleshooting & monitoring** | Trace agent sessions back to the commit or release they affected and allow tracking logs in their correct context and for as long as they could be needed                   |
-| **Policy-as-code validation**    | Automatically check harnesses, models, tools, owners, and outcomes                                                                                                          |
-| **Human oversight**              | Allow optimization of human review to only when risk is suspected or when a human oversight was missing from the process                                                   |
-| **Regulatory alignment**         | Persist process logs for retention windows (e.g. EU AI Act Art. 19: ≥ 6 months) in a way that links to the development process, identify missing human oversight |
+| Capability                       | What it unlocks                                                                                                                                                                         |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Troubleshooting & monitoring** | Trace agent sessions back to the commit or release they affected and allow tracking logs in their correct context and for as long as they could be needed                                                                                                                                                                                           |
+| **Policy-as-code validation**    | Automatically check harnesses, models, tools, owners, and outcomesCheck that agentic session:- Evidence exists, signed and relevant (the relevant SDLC entity is the subject)- Used approved policy documents as context- That agentic session ran with approved agents and models- Was reviewed by a human, and by whom- Has a named human owner |
+| **Human oversight**              | Allow optimization of human review to only when risk is identified or when a human oversight was missing from the process                                                                                                                                                                                                                           |
+| **Regulatory alignment**         | Persist process logs for retention windows (e.g. EU AI Act Art. 19: ≥ 6 months) in a way that they links themn to the development process, identify missing human oversight                                                                                                                                               
 
 
 By attaching **in-toto-style evidence** to git commits, artifacts and application releases, agentic activity becomes first-class release provenance—collectable SLSA-style evidence.
@@ -86,14 +86,13 @@ The **agent session trace** relevant to the agentic session — prompts, tool us
 
 | Attribute                 | Guidance                                                                                           |
 | ------------------------- | -------------------------------------------------------------------------------------------------- |
-| **Schema**             | [Agentic session log](spec/agentic-session-log.md)  |
+| **Schema**                | [Agentic session log](spec/agentic-session-log.md)                                                 |
 | **Cardinality**           | Many session logs per commit; one commit per session log (the commit that session created/updated) |
 | **Type**                  | Generic artifact                                                                                   |
 | **Location**              | Persistent storage with search capabilities                                                        |
 | **Searchable Attributes** | `agent`, `tools`, `commit`, `session_id` (and optionally `parent_session_id`)                      |
 | **Used for**              | Deep troubleshooting                                                                               |
 | **Retention**             | Aligned to release retention (minimum of 6 months accoring to EU regulation for certain software)  |
-
 
 
 #### Relationships
@@ -108,7 +107,7 @@ The **agent session trace** relevant to the agentic session — prompts, tool us
 
 | Attribute         | Guidance                                                                                                                                                                        |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Schema**        | [Agentic session eviednce](spec/agentic-session-evidence.md)                                                                                                                                                 |
+| **Schema**        | [Agentic session eviednce](spec/agentic-session-evidence.md)                                                                                                                    |
 | **predicateType** | e.g. `https://jfrog.com/evidence/agentic-code-review`, `https://jfrog.com/evidence/agentic-dev-process`                                                                         |
 | **Contains**      | Provider (harness / agent / LLMs), session IDs, session logs, tools, context artifacts, result, intents, summary, owner, reviewers, timestamps and process relevant custom data |
 | **Used for**      | Provenance on the agentic process allowing for Policy checks and auditing                                                                                                       |
@@ -237,10 +236,10 @@ Policy engine + human review / audit drill-down
 ## Repository contents
 
 
-| Path                       | Description                                                                                                           |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `[spec/](./spec/)`         | Normative entities: session log, process log, AI process evidence, agent identifier, alignment evidence, runtime tool |
-| `[README.md](./README.md)` | Orientation and adoption guide (this file)                                                                            |
+| Path                       | Description                                                                               |
+| -------------------------- | ----------------------------------------------------------------------------------------- |
+| `[spec/](./spec/)`         | session log, agentic session evidence, agent identifier, alignment evidence, runtime tool |
+| `[README.md](./README.md)` | Orientation and adoption guide (this file)                                                |
 
 
 ---
