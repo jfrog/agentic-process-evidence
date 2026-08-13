@@ -5,7 +5,7 @@ All agentic processes can be documented using this standard. We focus examples o
 
 This repository defines how to bind agent session information to SDLC entities (commits, artifacts, application versions) so organizations can govern their AI-assisted work with the same rigor as traditional release process.
 
-Entity definitions live under `[spec/](./spec/)`. 
+Entity definitions live under [spec/](./spec/). 
 
 ---
 
