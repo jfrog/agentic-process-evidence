@@ -6,7 +6,7 @@ Persistence and search model for agentic session logs stored as [Session log (BO
 
 Provide a persistence store and search capabilities for agentic process session logs so operators can download and review them as part of human oversight.
 
-Logs should be searchable by the subject that was produced (PR, commit, version). Scannable properties (tools, agents, suspected policy issues) support additional locate-and-review scenarios.
+Logs should be searchable by the subject that was produced (PR, commit, version). Searchable properties (tools, agents, suspected policy issues) support additional locate-and-review scenarios.
 
 ## Regulatory note
 
@@ -28,6 +28,8 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
 ```json
 {
   "conversation_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "parent_session_id": "4o7g54cd-8957-7503-45ga-495867457986",
+  "subject": {"gitCommit":"bf02510c8ce0b804a099797510af"},
   "provider": {
     "harness": {
       "name": "cursor",
@@ -108,7 +110,7 @@ Notes:
 - `path_hashes` on tool events is optional (pre/post tool-use fingerprints).
 - `processEnd` (or `stop`) triggers immediate flush to durable storage.
 
-## Scannable attributes (artifact metadata)
+## Searchable attributes
 
 Used to identify breached components and locate related processes:
 
@@ -116,7 +118,7 @@ Used to identify breached components and locate related processes:
 |---|---|
 | `tools` | Tools used (lists and versions) |
 | `agent` | Agent metadata |
-| `commit` | Subject keys for locating change commit(s) |
+| `subject` | Subject keys for locating change commit(s)/other subjects |
 | `session_id` | Run id |
 | `parent_session_id` | Parent session / run id |
 

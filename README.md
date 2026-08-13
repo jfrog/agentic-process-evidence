@@ -116,6 +116,10 @@ The **agent session trace** relevant to the agentic session — prompts, tool us
 
 **Provenance evidence** whose subject is the SDLC entity the agent handled—typically a **git commit**; for release approval, the **application release,** and for an artifact, the **artifact digest**.
 
+The agentic session evidence should only be created once the agentic process completes, e.g. code is commited, code review is completed, release was promoted, alignment check done. 
+
+
+
 
 | Attribute         | Guidance                                                                                                                                                                        |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -198,7 +202,7 @@ We recommand signing the evidence using DSSE ([https://github.com/secure-systems
 
 1. **Pick subjects** — Start with `git commit` for development and review; extend to application release promotion or approval.
 2. **Instrument the runtime** — Ensure the agent harness emits a session timeline (hooks or equivalent) and the Agent runtime tool flushes logs + evidence appropreately (e.g. on commit for development process).
-3. **Store session logs as artifacts** — Attach scannable properties (`tools`, `agent`, `commit`, `session_id`) so you can find all sessions that used a compromised tool or flagged policy issue.
+3. **Store session logs** — Persist the session logs and enable minimal searchable attributes (`tools`, `agent`, `commit`, `session_id`) so you can find all sessions that used a compromised tool or flagged policy issue.
 4. **Publish AI Process evidence** — Sign and attach the in-toto statement to the commit.
 5. **Create policy-as-code** — Whitelist harnesses, agents, LLMs; require owners/reviewers; gate on `result` and alignment verdicts.
 6. **Route exceptions to humans** — Use `reviewers`, and when avaialble `intents` and `processSummary`, and session log URIs for rapid approval when policy cannot decide.
