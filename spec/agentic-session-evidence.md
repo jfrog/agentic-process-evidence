@@ -38,36 +38,27 @@ The entity produced or handled by the agentic process:
     }
   ],
   "predicateType": "https://myorg.com/evidence/<agnetic-code-review|agnetic-dev-process>/v1",
-  "predicate": {
-    "provider": {
-      "harness": [
-        {
-          "name": "cursor",
-          "version": "3.5.33"
-        }
-      ],
-      "agent": [
-        {
-          "id": "stable-agent-id",
-          "name": "cursor-agent",
-          "version": "1.0"
-        }
-      ],
-      "languageModels": [
-        {
-          "inferenceProvider": "anthropic/claude-opus-4-8",
-          "resolved": "anthropic/claude-opus-4-8-20260701"
-        }
-      ]
-    },
-    "sessionId": "trace id | ci_job_run_uri | vendor session id",
+  "predicate": {    
+    "providers": [
+      {
+      "harness": 
+        {"name": "cursor","version": "3.5.33"}
+      ,
+      "agent": 
+        {"id": "stable-agent-id","name": "cursor-agent", "version": "1.0"}
+      ,
+      "languageModel": 
+        {"inferenceProvider": "anthropic/claude-opus-4-8","resolved": "anthropic/claude-opus-4-8-20260701"}              
+    }],
+    "traceId": "trace id | ci_job_run_uri | vendor session id",
     "sessionsLogs": [
       {
         "uri": "session log url",
         "digest": "session log sha..."
       }
     ],
-    "tools": ["tool-name"],
+    
+    "tools": [{"name":"tool-name", "version": "tool version"}],
     "contextArtifacts": [
       {
         "tags": ["policy"],
@@ -131,19 +122,21 @@ Provider identity fields are defined in [`agent-identifier.md`](./agent-identifi
 
 | Field | Type | Description | Usages |
 |---|---|---|---|
-| `provider.harness.name` | String | Required. Name of the agentic provider harness | Verify approved / whitelisted harness |
-| `provider.harness.version` | String | Required. Version of the agentic harness | Verify approved harness versions |
-| `provider.agent.id` | String | Stable agent id | Traceability |
-| `provider.agent.name` | String | Agent name | Check whitelisted agents |
-| `provider.agent.version` | String | Agent version | Check whitelisted agent versions |
-| `provider.languageModels` | Array | Array of used LLM models | Model governance |
-| `provider.languageModels.inferenceProvider` | String | Name and version of the LLM requested, if known | Check whitelisted LLMs |
-| `provider.languageModels.resolved` | String | Name and version of the LLM used, if known | Resolved model attribution |
-| `sessionId` | String | Required. Unique identifier of the agentic process | Correlate to original logs; identify runner |
+| `providers[]` | Object Array | Required. details of the agentic provider harness, agent and language model | Verify approved / whitelisted harness |
+| `providers[].harness.name` | String | Required. Name of the agentic provider harness | Verify approved / whitelisted harness |
+| `providers[].harness.version` | String | Required. Version of the agentic harness | Verify approved harness versions |
+| `providers[].agent.id` | String | Stable agent id | Traceability |
+| `providers[].agent.name` | String | Agent name | Check whitelisted agents |
+| `providers[].agent.version` | String | Agent version | Check whitelisted agent versions |
+| `providers[].languageModel.inferenceProvider` | String | Name and version of the LLM requested, if known | Check whitelisted LLMs |
+| `providers[].languageModel.resolved` | String | Name and version of the LLM used, if known | Resolved model attribution |
+| `traceId` | String | Unique identifier of the agentic process | Correlate to original logs; identify runner |
 | `sessionsLogs` | Object array | Links to session logs (full agentic chat context) | Download logs for review |
 | `sessionsLogs[].uri` | String | Location of the session log artifact | Download logs for review |
 | `sessionsLogs[].digest` | String | Digest of the session log artifact | Mutability check |
-| `tools` | String array | Used tool names | Check for blacklisted tools |
+| `tools` | Object array | Used tools | Check for blacklisted tools |
+| `tools[].name` | String | Used tool name | Check for blacklisted tools |
+| `tools[].version` | String | Used tool version | Check for blacklisted tool versions |
 | `contextArtifacts` | Object array | Artifacts used by the process (policies, instructions, prior logs, guidelines, …) | Input provenance |
 | `contextArtifacts[].tags` | String array | Labels of the artifact | Check use of corporate sources |
 | `contextArtifacts[].uri` | String | Required unless `data` is given. Location of the context artifact | Check specific inputs used |

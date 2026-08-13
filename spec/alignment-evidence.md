@@ -6,6 +6,10 @@ Evidence based on the agentic process that improves control over **intent alignm
 
 ## Generation process
 
+The generation process can be implemented in different stages, few examples: commit, PR checks, artifact builds, or release promotion.
+The subject of the evidence depends on the planned usage and can be set to the session log, commit, or other relevant entities which the session log(s) are relevant to. 
+We do recommand that the alignment evidence subject be set to the session log artifact to simplify locating where a violation resides. In that case, each session log included in a commit will be evaluated against policy documents and generate an alignment evidence with the session log artifact as its subject.
+
 On commit, the client-side agentic process:
 
 1. Collects all process logs (same path that creates development process evidence)
@@ -19,9 +23,9 @@ On commit, the client-side agentic process:
   "_type": "https://in-toto.io/Statement/v1",
   "subject": [
     {
-      "uri": "https://github.jfrog.info/JFROG/evidence/commit/bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892",
+      "uri": "https://myorg.jfrog.io/JFROG/evidence/commit/bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892",
       "digest": {
-        "gitCommit|sha256": "bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892"
+        "sha256": "bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892"
       }
     }
   ],
@@ -60,9 +64,9 @@ On commit, the client-side agentic process:
     ],
     "custom": {
       "baseCommit": {
-        "uri": "https://github.jfrog.info/JFROG/evidence/commit/bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892",
+        "uri": "https://myorg.jfrog.io/artifactory/gitCommit-entity/1b94ebd1ef32a4be4480dc70ed8ec2c6d55a2a0c.json",
         "digest": {
-          "gitCommit": "bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892"
+          "gitCommit": "1b94ebd1ef32a4be4480dc70ed8ec2c6d55a2a0c"
         }
       },
       "violations": ["short violation description"]
@@ -79,7 +83,7 @@ On commit, the client-side agentic process:
 
 ## Notes
 
-- Subject is typically the same git commit as [AI Process evidence](./ai-process-evidence.md)
+- Subject in each alignment evidence is typically each session log included in the git commits as [agentic session evidence](./ai-process-evidence.md)
 - `contextArtifacts` should include the intents policy (uri and/or inline `data` + digest)
 - Intents analysis algorithms are out of scope; this entity defines the evidence envelope only
 - See [`agent-identifier.md`](./agent-identifier.md) for provider identity
