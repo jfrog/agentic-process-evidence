@@ -20,7 +20,7 @@ We believe that organizations must be able to answer the minimal below questions
 - Which systems built/tested/approved our code?
 - Was the system aware of our organizational policies and guidelines?
 - Who is accountable?
-- Was a human involved in the process? 
+- Was a human involved in the process?
 
 We also believe, that more in-depth information must be available:
 
@@ -32,12 +32,12 @@ As agents take more roles, and as they become more independent, the ability for 
 This standard enables:
 
 
-| Capability                       | What it unlocks                                                                                                                                                                                                                                                                                                                                     |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Troubleshooting & monitoring** | Trace agent sessions back to the commit or release they affected and allow tracking logs in their correct context and for as long as they could be needed                                                                                                                                                                                           |
-| **Policy-as-code validation**    | Automatically check harnesses, models, tools, owners, and outcomesCheck that agentic session:- Evidence exists, signed and relevant (the relevant SDLC entity is the subject)- Used approved policy documents as context- That agentic session ran with approved agents and models- Was reviewed by a human, and by whom- Has a named human owner |
-| **Human oversight**              | Allow optimization of human review to only when risk is identified or when a human oversight was missing from the process                                                                                                                                                                                                                           |
-| **Regulatory alignment**         | Persist process logs for retention windows (e.g. EU AI Act Art. 19: ≥ 6 months) in a way that they links themn to the development process, identify missing human oversight                                                                                                                                                                         |
+| Capability                       | What it unlocks                                                                                                                                                                                                                                                                                                                         | usage examples                                                                                                                                 |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Troubleshooting & monitoring** | Trace agent sessions back to the commit or release they affected, and keep the logs in their correct context for as long as they could be needed                                                                                                                                                                                        | Supply chain traceability: MCP server is disclosed as malicious — search logs by `tools` and follow `commit` to every release that shipped it. |
+| **Policy-as-code validation**    | Automatically check harnesses, models, tools, owners, and outcomes. Check that an agentic session: has evidence that exists, is signed, and is relevant (the SDLC entity is the subject); used approved policy documents as context; ran with approved agents and models; was reviewed by a human, and by whom; has a named human owner | A package is blocked from production because a merge commit ran on a non-allowlisted model and has no named `owner`.                           |
+| **Human oversight**              | Allow optimization of human review to only when risk is identified, or when human oversight was missing from the process                                                                                                                                                                                                                | 235 of 240 commits are `ALIGNED` ; the 5 `MISALIGNED` on pricing require additional approval from the pricing features owner.                  |
+| **Regulatory alignment**         | Persist process logs for retention windows (e.g. EU AI Act Art. 19: ≥ 6 months) and link them to the development process, so missing human oversight becomes identifiable                                                                                                                                                               | ---                                                                                                                                            |
 
 
 By attaching **in-toto-style evidence** to git commits, artifacts and application releases, agentic activity becomes first-class release provenance—collectable SLSA-style evidence.
@@ -115,6 +115,10 @@ The **agent session trace** relevant to the agentic session — prompts, tool us
 ### 2. Agentic Session evidence
 
 **Provenance evidence** whose subject is the SDLC entity the agent handled—typically a **git commit**; for release approval, the **application release,** and for an artifact, the **artifact digest**.
+
+The agentic session evidence should only be created once the agentic process completes, e.g. code is commited, code review is completed, release was promoted, alignment check done. 
+
+
 
 
 | Attribute         | Guidance                                                                                                                                                                        |
@@ -198,7 +202,7 @@ We recommand signing the evidence using DSSE ([https://github.com/secure-systems
 
 1. **Pick subjects** — Start with `git commit` for development and review; extend to application release promotion or approval.
 2. **Instrument the runtime** — Ensure the agent harness emits a session timeline (hooks or equivalent) and the Agent runtime tool flushes logs + evidence appropreately (e.g. on commit for development process).
-3. **Store session logs as artifacts** — Attach scannable properties (`tools`, `agent`, `commit`, `session_id`) so you can find all sessions that used a compromised tool or flagged policy issue.
+3. **Store session logs** — Persist the session logs and enable minimal searchable attributes (`tools`, `agent`, `commit`, `session_id`) so you can find all sessions that used a compromised tool or flagged policy issue.
 4. **Publish AI Process evidence** — Sign and attach the in-toto statement to the commit.
 5. **Create policy-as-code** — Whitelist harnesses, agents, LLMs; require owners/reviewers; gate on `result` and alignment verdicts.
 6. **Route exceptions to humans** — Use `reviewers`, and when avaialble `intents` and `processSummary`, and session log URIs for rapid approval when policy cannot decide.
