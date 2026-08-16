@@ -1,6 +1,6 @@
 # Agentic session log
 
-Persistence and search model for agentic session logs stored as [Session log (BOM)](./session-log.md) artifacts.
+Persistence and search model for agentic session logs stored as [Session log (BOM)](./agentic-session-log.md) artifacts.
 
 ## Purpose
 

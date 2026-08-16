@@ -15,7 +15,7 @@ Agentic tools (IDE agents, review bots, release assistants) change code and infl
 
 This introduces blind spots in SDLC where organizations have limited ability to identify and control these agentic processes or apply risk based decisions on how they are handled, and validated and also how they can be audited later on.   
 
-We believe that organizations must be able to answer the minimal below questions  
+We believe that organizations must be able to answer the following minimal questions  
 
 - Which systems built/tested/approved our code?
 - Was the system aware of our organizational policies and guidelines?
@@ -24,7 +24,7 @@ We believe that organizations must be able to answer the minimal below questions
 
 We also believe, that more in-depth information must be available:
 
-- Did the system in fact comply with the organization intents?
+- Did the system in fact comply with the organization's intents?
 - Thorough review of the systems logs must be supported
 
 As agents take more roles, and as they become more independent, the ability for an organization to make sure its architecture and policies are preserved becomes a challenge. This project offers a way to bring that control and assurance back into software development. 
@@ -62,7 +62,7 @@ on commit:
 │  on gitCommit.           │                               │
 └──────────────────────────┘                               │
                                                            │
-PR/build/other alignemnt check (optional)                  │
+PR/build/other alignment check (optional)                  │
                                                            │
 ┌───────────────────────────┐   referenced by              │
 │ Agentic alignment check   │ ─────────────────────────────┘
@@ -104,7 +104,7 @@ The **agent session trace** relevant to the agentic session — prompts, tool us
 | **Location**              | Persistent storage with search capabilities                                                        |
 | **Searchable Attributes** | `agent`, `tools`, `commit`, `session_id` (and optionally `parent_session_id`)                      |
 | **Used for**              | Deep troubleshooting                                                                               |
-| **Retention**             | Aligned to release retention (minimum of 6 months accoring to EU regulation for certain software)  |
+| **Retention**             | Aligned to release retention (minimum of 6 months according to EU regulation for certain software)  |
 
 
 #### Relationships
@@ -116,14 +116,14 @@ The **agent session trace** relevant to the agentic session — prompts, tool us
 
 **Provenance evidence** whose subject is the SDLC entity the agent handled—typically a **git commit**; for release approval, the **application release,** and for an artifact, the **artifact digest**.
 
-The agentic session evidence should only be created once the agentic process completes, e.g. code is commited, code review is completed, release was promoted, alignment check done. 
+The agentic session evidence should only be created once the agentic process completes, e.g. code is committed, code review is completed, release was promoted, alignment check done. 
 
 
 
 
 | Attribute         | Guidance                                                                                                                                                                        |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Schema**        | [Agentic session eviednce](spec/agentic-session-evidence.md)                                                                                                                    |
+| **Schema**        | [Agentic session evidence](spec/agentic-session-evidence.md)                                                                                                                    |
 | **predicateType** | e.g. `https://jfrog.com/evidence/agentic-code-review`, `https://jfrog.com/evidence/agentic-dev-process`                                                                         |
 | **Contains**      | Provider (harness / agent / LLMs), session IDs, session logs, tools, context artifacts, result, intents, summary, owner, reviewers, timestamps and process relevant custom data |
 | **Used for**      | Provenance on the agentic process allowing for Policy checks and auditing                                                                                                       |
@@ -152,19 +152,19 @@ The runtime tool should be active for every agentic SDLC flow you intend to gove
 
 #### 3.2. Alignment Violations evidence
 
-Runs at desired pipeline steps (Code Commit/PR review/release promotion/other) for agentically checking alignemnt of an agnetic session (e.g. agentic development session) to the organization policies and for flagging high-risk intents.
+Runs at desired pipeline steps (Code Commit/PR review/release promotion/other) for agentically checking alignment of an agentic session (e.g. agentic development session) to the organization policies and for flagging high-risk intents.
 
 `predicateType`: `https://jfrog.com/evidence/agentic-alignment/v1` 
 This process collects existing relevant session logs (git commit/PR commits/application release session logs) compares session logs against an intent/policy resource(s) and records `ALIGNED` | `MISALIGNED` plus violation summaries. 
 The alignment evidence can then be used in policy checks for blocking a release or requiring additional approvals and oversight.
-The alignment evidence subject can be either the session log that was evaluation, or an SDLC entity such as a commit, pr, release or artifact based on the pipeline step its executed in and the intended usage.
+The alignment evidence subject can be either the session log that was evaluated, or an SDLC entity such as a commit, pr, release or artifact based on the pipeline step it's executed in and the intended usage.
 
 #### 3.3. PR Approval
 
 Runs once an agentic PR approval completes, either by a homegrown agentic approval tool or by a 3rd party PR Approve product.
 
 `predicateType`: `https://jfrog.com/evidence/agentic-code-review/v1` 
-This process collects all relevant session logs generated in the review process and uploads them, then generates the agentic review provenance adding also the review verdict and the git information for the code diff that was reviewd and requirements against the code was reviewed.  
+This process collects all relevant session logs generated in the review process and uploads them, then generates the agentic review provenance adding also the review verdict and the git information for the code diff that was reviewed and requirements against which the code was reviewed.  
 
 ---
 
@@ -182,7 +182,7 @@ Evidence follows [in-toto Statement v1](https://in-toto.io/). Minimum subject + 
 | `predicate.`*                        | See field tables in `[spec/agentic-session-evidence.md](./spec/agentic-session-evidence.md)` |
 
 
-We recommand signing the evidence using DSSE ([https://github.com/secure-systems-lab/dsse](https://github.com/secure-systems-lab/dsse)).
+We recommend signing the evidence using DSSE ([https://github.com/secure-systems-lab/dsse](https://github.com/secure-systems-lab/dsse)).
 
 **Predicate highlights for policy and humans:**
 
@@ -201,11 +201,11 @@ We recommand signing the evidence using DSSE ([https://github.com/secure-systems
 ### Adopt in an organization
 
 1. **Pick subjects** — Start with `git commit` for development and review; extend to application release promotion or approval.
-2. **Instrument the runtime** — Ensure the agent harness emits a session timeline (hooks or equivalent) and the Agent runtime tool flushes logs + evidence appropreately (e.g. on commit for development process).
+2. **Instrument the runtime** — Ensure the agent harness emits a session timeline (hooks or equivalent) and the Agent runtime tool flushes logs + evidence appropriately (e.g. on commit for development process).
 3. **Store session logs** — Persist the session logs and enable minimal searchable attributes (`tools`, `agent`, `commit`, `session_id`) so you can find all sessions that used a compromised tool or flagged policy issue.
 4. **Publish AI Process evidence** — Sign and attach the in-toto statement to the commit.
 5. **Create policy-as-code** — Whitelist harnesses, agents, LLMs; require owners/reviewers; gate on `result` and alignment verdicts.
-6. **Route exceptions to humans** — Use `reviewers`, and when avaialble `intents` and `processSummary`, and session log URIs for rapid approval when policy cannot decide.
+6. **Route exceptions to humans** — Use `reviewers`, and when available `intents` and `processSummary`, and session log URIs for rapid approval when policy cannot decide.
 7. **Retain** — Keep session logs and evidence at least as long as release is relevant.
 
 ### Integrate in a pipeline (typical flow example)
