@@ -8,7 +8,7 @@ Evidence based on the agentic process that improves control over **intent alignm
 
 The generation process can be implemented in different stages, few examples: commit, PR checks, artifact builds, or release promotion.
 The subject of the evidence depends on the planned usage and can be set to the session log, commit, or other relevant entities which the session log(s) are relevant to. 
-We do recommand that the alignment evidence subject be set to the session log artifact to simplify locating where a violation resides. In that case, each session log included in a commit will be evaluated against policy documents and generate an alignment evidence with the session log artifact as its subject.
+We do recommend that the alignment evidence subject be set to the session log artifact to simplify locating where a violation resides. In that case, each session log included in a commit will be evaluated against policy documents and generate an alignment evidence with the session log artifact as its subject.
 
 On commit, the client-side agentic process:
 
@@ -16,16 +16,18 @@ On commit, the client-side agentic process:
 2. Checks the customer intents-policy resource against the process logs
 3. Emits evidence with verdict `ALIGNED` | `MISALIGNED` and a summary of problematic intents
 
-## Example
+## Example (session log as subject)
+
+The evaluated session log is the subject, so one alignment evidence is produced per log and `sessionsLogs` is omitted — the subject already identifies what was evaluated. The intents policy the log was checked against is a `contextArtifacts` entry.
 
 ```json
 {
   "_type": "https://in-toto.io/Statement/v1",
   "subject": [
     {
-      "uri": "https://myorg.jfrog.io/JFROG/evidence/commit/bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892",
+      "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.json",
       "digest": {
-        "sha256": "bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892"
+        "sha256": "9f2b8c1d7a4530e6...b8d0c7f1a2934ee41a"
       }
     }
   ],
@@ -41,25 +43,18 @@ On commit, the client-side agentic process:
         "name": "cursor-agent",
         "version": "1.0"
       },
-      "language_models": [
+      "languageModels": [
         {
-          "inference_provider": "anthropic/claude-opus-4-8",
+          "inferenceProvider": "anthropic/claude-opus-4-8",
           "resolved": "anthropic/claude-opus-4-8-20260701"
         }
       ]
     },
-    "sessionsLogs": [
-      {
-        "uri": "policy doc url",
-        "digest": "sha..."
-      }
-    ],
     "contextArtifacts": [
       {
-        "type": "policy",
-        "uri": "link-to-intents-policy",
-        "data": "The complete artifact document inline",
-        "digest": "policy-sha256"
+        "tags": ["policy"],
+        "uri": "https://myorg.jfrog.io/artifactory/policies/intents-policy-v4.md",
+        "digest": "41c0e93b6d28...7fa5029b8c1d64"
       }
     ],
     "custom": {
@@ -71,19 +66,50 @@ On commit, the client-side agentic process:
       },
       "violations": ["short violation description"]
     },
-    "result": "ALIGNED|MISALIGNED",
+    "result": "MISALIGNED",
     "owner": "login|email",
-    "startTimestamp": "ISO 8601 timestamp",
-    "endTimestamp": "ISO 8601 timestamp"
+    "startTimestamp": "2026-04-08T08:54:03.771Z",
+    "endTimestamp": "2026-04-08T08:55:11.004Z"
   },
   "createdAt": "2026-04-08T08:55:17.242Z",
   "createdBy": "dev-auto-reviewer"
 }
 ```
 
+`result` is one of `ALIGNED` or `MISALIGNED`. Provider identity uses the field names in [`agent-identifier.md`](./agent-identifier.md), and `contextArtifacts[].data` replaces `uri` when the policy is inlined rather than linked.
+
+## Alternative subject (SDLC entity)
+
+When the gate acts on the SDLC entity rather than on an individual log — for example a release promotion check that evaluates every log in the release — set the subject to that entity. Here `sessionsLogs` is required, because it is the only record of which logs the verdict covers. The rest of the predicate is unchanged. The trade-off is that a `MISALIGNED` verdict names a set of logs rather than pinpointing one, which is why the session log subject is recommended.
+
+```json
+{
+  "subject": [
+    {
+      "uri": "https://github.com/MYORG/evidence/commit/1b94ebd1ef32a4be4480dc70ed8ec2c6d55a2a0c",
+      "digest": {
+        "gitCommit": "1b94ebd1ef32a4be4480dc70ed8ec2c6d55a2a0c"
+      }
+    }
+  ],
+  "predicate": {
+    "sessionsLogs": [
+      {
+        "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.json",
+        "digest": "9f2b8c1d7a4530e6...b8d0c7f1a2934ee41a"
+      },
+      {
+        "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/7c3e91af-2b58-4d10-9e6f-1a2b3c4d5e6f.json",
+        "digest": "3ad70f5c9e18...42b6d8091fae57"
+      }
+    ]
+  }
+}
+```
+
 ## Notes
 
-- Subject in each alignment evidence is typically each session log included in the git commits as [agentic session evidence](./ai-process-evidence.md)
+- Subject in each alignment evidence is typically each session log included in the git commits as [agentic session evidence](./agentic-session-evidence.md)
 - `contextArtifacts` should include the intents policy (uri and/or inline `data` + digest)
 - Intents analysis algorithms are out of scope; this entity defines the evidence envelope only
 - See [`agent-identifier.md`](./agent-identifier.md) for provider identity

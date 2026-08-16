@@ -2,7 +2,7 @@
 
 Provenance evidence on the agentic process. Enables rapid human and policy-as-code approval.
 
-References Agentic process session logs and attests on the process in which they were gnerated, with the evidence **subject** typically a `gitCommit`.
+References Agentic process session logs and attests on the process in which they were generated, with the evidence **subject** typically a `gitCommit`.
 
 ## Subject
 
@@ -24,7 +24,7 @@ The entity produced or handled by the agentic process:
 | **Usage** | Provenance evidence when auditors drill down into randomly selected releases |
 | **Retention** | As long as release is required |
 
-## Example (Developemnt session evidence on a Code Commit subject)
+## Example (Development session evidence on a Code Commit subject)
 
 ```json
 {
@@ -37,7 +37,7 @@ The entity produced or handled by the agentic process:
       }
     }
   ],
-  "predicateType": "https://myorg.com/evidence/<agnetic-code-review|agnetic-dev-process>/v1",
+  "predicateType": "https://myorg.com/evidence/<agentic-code-review|agentic-dev-process>/v1",
   "predicate": {    
     "providers": [
       {
@@ -73,10 +73,9 @@ The entity produced or handled by the agentic process:
       }
     ],
     "custom": {
-        "uri": "https://github.com/MYORG/evidence/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
-        "digest": {
-          "gitCommit": "bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892"
-        }
+      "uri": "https://github.com/MYORG/evidence/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
+      "digest": {
+        "gitCommit": "bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892"
       },
       "requirements": [
         {
@@ -153,12 +152,12 @@ Provider identity fields are defined in [`agent-identifier.md`](./agent-identifi
 
 ## Development process custom data
 
-Optional. Custom attributes should allow adding and process-specific data (review, development, promotion, etc.).
+Optional. Custom attributes should allow adding any process-specific data (review, development, promotion, etc.).
 
 | Field | Type | Description | Usages |
 |---|---|---|---|
 | `baseCommit.uri` | String | Code commit URI | Code repo validation |
 | `baseCommit.digest.gitCommit` | String | Code commit SHA | Code SHA immutability |
-| `requirements` | Array | Requirements issues | Checking that requirements exists and were used |
+| `requirements` | Array | Requirements issues | Checking that requirements exist and were used |
 | `requirements.issue` | String | Task URL | Requirements system is approved |
 | `requirements.title` | String | Task title | Display / review |
