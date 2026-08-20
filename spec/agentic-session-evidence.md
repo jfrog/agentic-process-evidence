@@ -4,6 +4,8 @@ Provenance evidence on the agentic process. Enables rapid human and policy-as-co
 
 References Agentic process session logs and attests on the process in which they were generated, with the evidence **subject** typically a `gitCommit`.
 
+JSON field names defined by this standard use **camelCase**.
+
 ## Subject
 
 The entity produced or handled by the agentic process:
@@ -33,49 +35,64 @@ The entity produced or handled by the agentic process:
     {
       "uri": "https://github.com/MYORG/evidence/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
       "digest": {
-        "gitCommit|sha256": "bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892"
+        "gitCommit": "bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892"
       }
     }
   ],
   "predicateType": "https://myorg.com/evidence/<agentic-code-review|agentic-dev-process>/v1",
-  "predicate": {    
+  "predicate": {
     "providers": [
       {
-      "harness": 
-        {"name": "cursor","version": "3.5.33"}
-      ,
-      "agent": 
-        {"id": "stable-agent-id","name": "cursor-agent", "version": "1.0"}
-      ,
-      "languageModel": 
-        {"inferenceProvider": "anthropic/claude-opus-4-8","resolved": "anthropic/claude-opus-4-8-20260701"}              
-    }],
+        "harness": {
+          "name": "cursor",
+          "version": "3.5.33"
+        },
+        "agent": {
+          "id": "stable-agent-id",
+          "name": "cursor-agent",
+          "version": "1.0"
+        },
+        "languageModels": [
+          {
+            "inferenceProvider": "anthropic/claude-opus-4-8",
+            "resolved": "anthropic/claude-opus-4-8-20260701"
+          }
+        ]
+      }
+    ],
     "traceId": "trace id | ci_job_run_uri | vendor session id",
     "sessionsLogs": [
       {
         "uri": "session log url",
-        "digest": "session log sha..."
+        "digest": {
+          "sha256": "session log sha..."
+        }
       }
     ],
-    
-    "tools": [{"name":"tool-name", "version": "tool version"}],
+    "tools": [{"name": "tool-name", "version": "tool version"}],
     "contextArtifacts": [
       {
         "tags": ["policy"],
         "uri": "link-to-development-guideline",
-        "data": "The complete artifact document inline", 
-        "digest": "policy-sha256"
+        "data": "The complete artifact document inline",
+        "digest": {
+          "sha256": "policy-sha256"
+        }
       },
       {
-        "tags": ["policy"],
+        "tags": ["guideline"],
         "uri": "link-to-architecture-guidelines",
-        "digest": "architecture-sha256"
+        "digest": {
+          "sha256": "architecture-sha256"
+        }
       }
     ],
     "custom": {
-      "uri": "https://github.com/MYORG/evidence/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
-      "digest": {
-        "gitCommit": "bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892"
+      "baseCommit": {
+        "uri": "https://github.com/MYORG/evidence/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
+        "digest": {
+          "gitCommit": "bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892"
+        }
       },
       "requirements": [
         {
@@ -101,63 +118,158 @@ The entity produced or handled by the agentic process:
 
 Provider identity fields are defined in [`agent-identifier.md`](./agent-identifier.md).
 
+**Required** in the tables below: `yes` = must be present and non-empty; `no` = optional; `conditional` = see Constraints. **MUST**, **SHOULD**, **MAY**, and related words follow [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) as stated in [README Conventions](../README.md#conventions).
+
+## Digest set
+
+`digest` is a **DigestSet**: a JSON object mapping algorithm name to a lowercase hex-encoded digest string. At least one entry is required.
+
+On `subject[].digest` this is the in-toto Statement v1 type. Predicate fields that name a digest (`sessionsLogs[].digest`, `contextArtifacts[].digest`, `baseCommit.digest`) reuse the same shape so every digest in this spec is one type.
+
+```json
+{
+  "gitCommit": "bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892"
+}
+```
+
+```json
+{
+  "sha256": "9f2b8c1d7a4530e6b8d0c7f1a2934ee41a"
+}
+```
+
+| Algorithm key | Value | When to use |
+|---|---|---|
+| `gitCommit` | Git object id, as `git rev-parse` reports it | Git commit subjects |
+| `sha256` | SHA-256 of the artifact bytes | Generic artifacts (session logs, files, blobs) |
+
+Additional algorithm keys MAY be present (`sha512`, `sha1`, …) with the same meaning as in-toto. Unknown keys MUST be ignored by consumers that do not understand them.
+
+A DigestSet is not a single string.
+
+## Resource descriptor
+
+A digest-linked reference to an artifact. Same idea as in-toto `ResourceDescriptor` (`uri` + `digest`); this spec uses only those two fields.
+
+```json
+{
+  "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.json",
+  "digest": {
+    "sha256": "9f2b8c1d7a4530e6b8d0c7f1a2934ee41a"
+  }
+}
+```
+
+| Field | Type | Required | Constraints | Description |
+|---|---|---|---|---|
+| `uri` | String | yes | URI | Location of the artifact |
+| `digest` | DigestSet | yes | ≥1 algorithm key; see [Digest set](#digest-set) | Immutable identity of the bytes at `uri` |
+
+Used as `predicate.sessionsLogs` (ResourceDescriptor array) and as `custom.baseCommit`. `subject[]` uses the same `uri` + `digest` pair because that is in-toto Statement v1.
+
+## Tool
+
+A tool used during the agentic process (IDE action, MCP server, CLI, etc.).
+
+```json
+{
+  "name": "Write",
+  "version": "1.0"
+}
+```
+
+| Field | Type | Required | Constraints | Description |
+|---|---|---|---|---|
+| `name` | String | yes | non-empty | Tool name as the harness reports it |
+| `version` | String | no | non-empty when present | Tool version as the producer reports it (not necessarily SemVer) |
+
+Used as `predicate.tools` (Tool array) on [agentic session evidence](./agentic-session-evidence.md), and as a searchable attribute on [agentic session log](./agentic-session-log.md).
+
+## Context artifact
+
+A policy, guideline, instruction, or other document the process used as input. Extends a [Resource descriptor](#resource-descriptor) with labels and an optional inline body.
+
+```json
+{
+  "tags": ["policy"],
+  "uri": "https://myorg.jfrog.io/artifactory/policies/intents-policy-v4.md",
+  "digest": {
+    "sha256": "41c0e93b6d287fa5029b8c1d64"
+  }
+}
+```
+
+| Field | Type | Required | Constraints | Description |
+|---|---|---|---|---|
+| `tags` | String array | no | values SHOULD be from [Context artifact tags](#context-artifact-tags); additional tags allowed | Labels of the artifact |
+| `uri` | String | conditional | URI; exactly one of `uri` or `data` | Location of the artifact |
+| `data` | String | conditional | exactly one of `uri` or `data` | Inline content of the artifact |
+| `digest` | DigestSet | no | ≥1 algorithm key when present; SHOULD include `sha256`; see [Digest set](#digest-set) | Immutable identity of the artifact bytes |
+
+Used as `predicate.contextArtifacts` (ContextArtifact array).
+
+### Context artifact tags
+
+Recommended values for `tags`. Other tags MAY be used.
+
+| Value | Meaning |
+|---|---|
+| `policy` | Organizational policy the process was expected to follow |
+| `guideline` | Architecture or development guideline |
+| `instructions` | Prompt, system, or agent instructions |
+| `priorLog` | Prior session log used as input |
+
 ## Evidence subject object
 
-| Field | Type | Description | Usages |
-|---|---|---|---|
-| `uri` | String | Required. URL of the subject | Locating the subject |
-| `subject.digest` | Object | Required. Unique immutable identifier of the subject (e.g. gitCommit, artifact sha256) | Signature verification and immutability checks |
+| Field | Type | Required | Constraints | Description | Usages |
+|---|---|---|---|---|---|
+| `uri` | String | yes | URI | URL of the subject | Locating the subject |
+| `digest` | DigestSet | yes | ≥1 algorithm key; see [Digest set](#digest-set) | Unique immutable identifier of the subject | Signature verification and immutability checks |
 
 ## Evidence classification and general information
 
-| Field | Type | Description | Usages |
-|---|---|---|---|
-| `predicateType` | String | Required. Type of this evidence | Filtering and existence checks |
-| `_type` | String | Required. Evidence schema: `https://in-toto.io/Statement/v1` | Schema type and version |
-| `createdAt` | ISO 8601 timestamp | Required. Evidence creation timestamp | Freshness checks |
-| `createdBy` | String | Required. Evidence creator | Optional permissions checks (prefer signing keys) |
+| Field | Type | Required | Constraints | Description | Usages |
+|---|---|---|---|---|---|
+| `predicateType` | String | yes | URI identifying this evidence kind | Type of this evidence | Filtering and existence checks |
+| `_type` | String | yes | exactly `https://in-toto.io/Statement/v1` | Evidence schema | Schema type and version |
+| `createdAt` | Timestamp | yes | ISO 8601 | Evidence creation timestamp | Freshness checks |
+| `createdBy` | String | yes | non-empty | Evidence creator | Optional permissions checks (prefer signing keys) |
 
 ## Evidence predicate object
 
-| Field | Type | Description | Usages |
-|---|---|---|---|
-| `providers[]` | Object Array | Required. details of the agentic provider harness, agent and language model | Verify approved / whitelisted harness |
-| `providers[].harness.name` | String | Required. Name of the agentic provider harness | Verify approved / whitelisted harness |
-| `providers[].harness.version` | String | Required. Version of the agentic harness | Verify approved harness versions |
-| `providers[].agent.id` | String | Stable agent id | Traceability |
-| `providers[].agent.name` | String | Agent name | Check whitelisted agents |
-| `providers[].agent.version` | String | Agent version | Check whitelisted agent versions |
-| `providers[].languageModel.inferenceProvider` | String | Name and version of the LLM requested, if known | Check whitelisted LLMs |
-| `providers[].languageModel.resolved` | String | Name and version of the LLM used, if known | Resolved model attribution |
-| `traceId` | String | Unique identifier of the agentic process | Correlate to original logs; identify runner |
-| `sessionsLogs` | Object array | Links to session logs (full agentic chat context) | Download logs for review |
-| `sessionsLogs[].uri` | String | Location of the session log artifact | Download logs for review |
-| `sessionsLogs[].digest` | String | Digest of the session log artifact | Mutability check |
-| `tools` | Object array | Used tools | Check for blacklisted tools |
-| `tools[].name` | String | Used tool name | Check for blacklisted tools |
-| `tools[].version` | String | Used tool version | Check for blacklisted tool versions |
-| `contextArtifacts` | Object array | Artifacts used by the process (policies, instructions, prior logs, guidelines, …) | Input provenance |
-| `contextArtifacts[].tags` | String array | Labels of the artifact | Check use of corporate sources |
-| `contextArtifacts[].uri` | String | Required unless `data` is given. Location of the context artifact | Check specific inputs used |
-| `contextArtifacts[].data` | String | Required unless `uri` is given. Content of the context artifact | Review inputs inline |
-| `contextArtifacts[].digest` | String | Digest of the context artifact | Mutability check |
-| `custom` | Object | Custom information for the specific agentic process | Process-specific checks |
-| `result` | String | Required. Short process completion state | Validate positive completion / verdict |
-| `intents` | String array | Short descriptions of intents identified in the process | Human oversight; agentic policy validation |
-| `processSummary` | String | Summarized description of the process | Human oversight; agentic policy validation |
-| `owner` | String | Required. Login or email of the accountable user | Accountability; permissions |
-| `reviewers` | String array | Logins or emails of human overseers (e.g. developer chatting during development or PR review) | Human oversight checks |
-| `startTimestamp` | ISO 8601 timestamp | Required. Process start | Duration checks |
-| `endTimestamp` | ISO 8601 timestamp | Required. Process end | Duration checks |
+| Field | Type | Required | Constraints | Description | Usages |
+|---|---|---|---|---|---|
+| `providers` | Provider array | yes | ≥1; see [Provider](./agent-identifier.md) | Agentic provider stacks used in the process | Verify approved / whitelisted harness |
+| `traceId` | String | no | non-empty when present | Unique identifier of the agentic process | Correlate to original logs; identify runner |
+| `sessionsLogs` | ResourceDescriptor array | no | 0..*; see [Resource descriptor](#resource-descriptor); each `digest` SHOULD include `sha256` | Links to session logs (full agentic chat context) | Download logs for review |
+| `tools` | Tool array | no | 0..*; see [Tool](#tool) | Used tools | Check for blacklisted tools |
+| `contextArtifacts` | ContextArtifact array | no | 0..*; see [Context artifact](#context-artifact) | Artifacts used by the process (policies, instructions, prior logs, guidelines, …) | Input provenance |
+| `custom` | Object | no | process-specific keys | Custom information for the specific agentic process | Process-specific checks |
+| `result` | String | yes | [Session result](#session-result) | Short process completion state | Validate positive completion / verdict |
+| `intents` | String array | no | 0..* | Short descriptions of intents identified in the process | Human oversight; agentic policy validation |
+| `processSummary` | String | no | | Summarized description of the process | Human oversight; agentic policy validation |
+| `owner` | String | yes | login or email | Login or email of the accountable user | Accountability; permissions |
+| `reviewers` | String array | no | 0..*; each login or email | Logins or emails of human overseers (e.g. developer chatting during development or PR review) | Human oversight checks |
+| `startTimestamp` | Timestamp | yes | ISO 8601 | Process start | Duration checks |
+| `endTimestamp` | Timestamp | yes | ISO 8601 | Process end | Duration checks |
+
+## Session result
+
+Closed set for `predicate.result` on agentic session evidence (development, review, promotion, and similar process evidence — not alignment evidence).
+
+| Value | Meaning |
+|---|---|
+| `COMPLETED` | Process finished successfully |
+| `FAILED` | Process ended unsuccessfully |
+| `CANCELLED` | Process stopped before completion |
 
 ## Development process custom data
 
 Optional. Custom attributes should allow adding any process-specific data (review, development, promotion, etc.).
 
-| Field | Type | Description | Usages |
-|---|---|---|---|
-| `baseCommit.uri` | String | Code commit URI | Code repo validation |
-| `baseCommit.digest.gitCommit` | String | Code commit SHA | Code SHA immutability |
-| `requirements` | Array | Requirements issues | Checking that requirements exist and were used |
-| `requirements.issue` | String | Task URL | Requirements system is approved |
-| `requirements.title` | String | Task title | Display / review |
+| Field | Type | Required | Constraints | Description | Usages |
+|---|---|---|---|---|---|
+| `baseCommit` | ResourceDescriptor | no | see [Resource descriptor](#resource-descriptor); `digest` SHOULD include `gitCommit` | Base code commit | Code repo / SHA immutability |
+| `requirements` | Object array | no | 0..* | Requirements issues | Checking that requirements exist and were used |
+| `requirements[].issue` | String | yes | URI | Task URL | Requirements system is approved |
+| `requirements[].title` | String | no | | Task title | Display / review |

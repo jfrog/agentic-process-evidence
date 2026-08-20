@@ -1,10 +1,14 @@
 # Agent identifier
 
-Identity of the agent runtime stack, included in agentic process evidence.
+This page defines the **Provider** type and its nested types **Harness**, **Agent**, and **LanguageModel**: identity of the agent runtime stack recorded on logs and evidence.
 
 Provides data for full traceability and helps mitigate supply-chain style attacks: **harness → agent → language model**.
 
-## Shape
+JSON field names defined by this standard use **camelCase**.
+
+**Required** in the tables below: `yes` = must be present and non-empty; `no` = optional. **MUST**, **SHOULD**, **MAY**, and related words follow [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) as stated in [README Conventions](../README.md#conventions).
+
+## Provider
 
 ```json
 {
@@ -26,14 +30,38 @@ Provides data for full traceability and helps mitigate supply-chain style attack
 }
 ```
 
-## Fields
+| Field | Type | Required | Constraints | Description |
+|---|---|---|---|---|
+| `harness` | Harness | yes | see [Harness](#harness) | Agentic provider harness |
+| `agent` | Agent | no | see [Agent](#agent) | Agent running in the harness |
+| `languageModels` | LanguageModel array | no | 0..*; see [Language model](#language-model) | Language models involved in the run |
 
-| Field | Description |
-|---|---|
-| `harness.name` / `harness.version` | Agentic provider harness |
-| `agent.id` | Stable agent identifier |
-| `agent.name` / `agent.version` | Agent name and version |
-| `languageModels[].inferenceProvider` | LLM requested (name/version), if known |
-| `languageModels[].resolved` | LLM actually used (name/version), if known |
+Used as `predicate.providers` (Provider array) on [agentic session evidence](./agentic-session-evidence.md) — one entry per distinct stack in the process. Used as a single `provider` field on [alignment evidence](./alignment-evidence.md) and on [agentic session log](./agentic-session-log.md) payloads.
 
-Embedded under `predicate.provider` in any [agentic session evidence](./agentic-session-evidence.md). Also recorded on [Agentic session log](./agentic-session-log.md) payloads.
+## Harness
+
+The agentic product that hosts the session (IDE, CI agent runner, review bot, and similar).
+
+| Field | Type | Required | Constraints | Description |
+|---|---|---|---|---|
+| `name` | String | yes | non-empty | Harness product name |
+| `version` | String | yes | non-empty | Harness version as emitted by the producer (not necessarily SemVer) |
+
+## Agent
+
+The agent running inside the harness.
+
+| Field | Type | Required | Constraints | Description |
+|---|---|---|---|---|
+| `id` | String | no | non-empty when present | Stable agent identifier |
+| `name` | String | no | non-empty when present | Agent name |
+| `version` | String | no | non-empty when present | Agent version as emitted by the producer (not necessarily SemVer) |
+
+## Language model
+
+A language model involved in the run: the one requested, the one actually used, or both when known.
+
+| Field | Type | Required | Constraints | Description |
+|---|---|---|---|---|
+| `inferenceProvider` | String | no | non-empty when present | LLM requested (name/version), if known |
+| `resolved` | String | no | non-empty when present | LLM actually used (name/version), if known |

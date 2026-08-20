@@ -4,6 +4,8 @@ Evidence based on the agentic process that improves control over **intent alignm
 
 `predicateType`: `https://jfrog.com/evidence/agentic-alignment/v1`
 
+JSON field names defined by this standard use **camelCase**. Shared predicate fields follow [agentic session evidence](./agentic-session-evidence.md) unless this page says otherwise.
+
 ## Generation process
 
 The generation process can be implemented in different stages, few examples: commit, PR checks, artifact builds, or release promotion.
@@ -54,7 +56,9 @@ The evaluated session log is the subject, so one alignment evidence is produced 
       {
         "tags": ["policy"],
         "uri": "https://myorg.jfrog.io/artifactory/policies/intents-policy-v4.md",
-        "digest": "41c0e93b6d28...7fa5029b8c1d64"
+        "digest": {
+          "sha256": "41c0e93b6d28...7fa5029b8c1d64"
+        }
       }
     ],
     "custom": {
@@ -76,7 +80,28 @@ The evaluated session log is the subject, so one alignment evidence is produced 
 }
 ```
 
-`result` is one of `ALIGNED` or `MISALIGNED`. Provider identity uses the field names in [`agent-identifier.md`](./agent-identifier.md), and `contextArtifacts[].data` replaces `uri` when the policy is inlined rather than linked.
+Provider identity uses the field names in [`agent-identifier.md`](./agent-identifier.md), and `contextArtifacts[].data` replaces `uri` when the policy is inlined rather than linked.
+
+**Required** in the tables below: `yes` = must be present and non-empty; `no` = optional; `conditional` = see Constraints. **MUST**, **SHOULD**, **MAY**, and related words follow [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) as stated in [README Conventions](../README.md#conventions).
+
+## Alignment result
+
+Closed set for `predicate.result` on alignment evidence. This is not the same enum as session evidence `COMPLETED` / `FAILED` / `CANCELLED`.
+
+| Value | Meaning |
+|---|---|
+| `ALIGNED` | Evaluated logs comply with the intents policy |
+| `MISALIGNED` | One or more violations against the intents policy |
+
+## Alignment predicate differences
+
+| Field | Type | Required | Constraints | Description | Usages |
+|---|---|---|---|---|---|
+| `provider` | Provider | yes | see [Provider](./agent-identifier.md) | Stack that performed the alignment check | Allowlist the checker |
+| `result` | String | yes | [Alignment result](#alignment-result) | Verdict | Gate promotion / require extra review |
+| `sessionsLogs` | ResourceDescriptor array | conditional | required (≥1) when the subject is an SDLC entity; omit when the subject is the evaluated session log; see [Resource descriptor](./agentic-session-evidence.md#resource-descriptor) | Logs covered by this verdict | Drill-down |
+| `contextArtifacts` | ContextArtifact array | yes | ≥1; see [Context artifact](./agentic-session-evidence.md#context-artifact); SHOULD include the intents policy (`tags` contains `policy`) | Policy documents used | Reproduce the check |
+| `custom.violations` | String array | no | 0..*; SHOULD be present when `result` is `MISALIGNED` | Short violation descriptions | Human review |
 
 ## Alternative subject (SDLC entity)
 
@@ -96,11 +121,15 @@ When the gate acts on the SDLC entity rather than on an individual log — for e
     "sessionsLogs": [
       {
         "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.json",
-        "digest": "9f2b8c1d7a4530e6...b8d0c7f1a2934ee41a"
+        "digest": {
+          "sha256": "9f2b8c1d7a4530e6...b8d0c7f1a2934ee41a"
+        }
       },
       {
         "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/7c3e91af-2b58-4d10-9e6f-1a2b3c4d5e6f.json",
-        "digest": "3ad70f5c9e18...42b6d8091fae57"
+        "digest": {
+          "sha256": "3ad70f5c9e18...42b6d8091fae57"
+        }
       }
     ]
   }
