@@ -46,50 +46,17 @@ By attaching **in-toto-style evidence** to git commits, artifacts and applicatio
 
 ## High-level model
 
-Agentic development process example: 
+![Agentic session evidence model: session log artifacts, the generic agentic session evidence, and its agentic-code-development, agentic-pr-review and agentic-alignment-check implementations](docs/diagrams/high-level-model.png)
 
-```
-on commit:
-┌─────────────────────┐       persist         ┌──────────────────────────┐
-│  Agent runtime tool │ ─────────────────────►│  Session log (BOM)       │
-│  (monitors session) │                       │  Full agent timeline     │
-└──────────┬──────────┘                       │  Stored as an artifact   │
-           │                                  └───┬────────┬─────────────┘
-           │ uploads evidence                     │        │ 
-           ▼                                      │        │ 
-┌──────────────────────────┐   referenced by      │        │
-│ Agentic session evidence │  ────────────────────┘        │
-│  on gitCommit.           │                               │
-└──────────────────────────┘                               │
-                                                           │
-PR/build/other alignment check (optional)                  │
-                                                           │
-┌───────────────────────────┐   referenced by              │
-│ Agentic alignment check   │ ─────────────────────────────┘
-│ on session log/sdlc entity│                  
-└───────────┬───────────────┘                  
-            │
-            │ uploads evidence 
-            ▼
-┌─────────────────────────────┐
-│     Alignment evidence      │
-│     ALIGNED / MISALIGNED    │
-└─────────────────────────────┘
+*Editable source: [docs/diagrams/high-level-model.excalidraw](docs/diagrams/high-level-model.excalidraw) — open it at [excalidraw.com](https://excalidraw.com).*
 
-                                                        
-On Agentic PR review:
-┌──────────────────────────┐ persist       ┌─────────────────────────────┐
-│ Agentic PR review        │──────────────►│     Session log (BOM)       │
-│                          │               │     Full agent timeline     │
-└──────────┬───────────────┘               │     Stored as an artifact   │
-           │                               └───┬─────────────────────────┘
-           │ uploads evidence                  │ 
-           ▼                                   │
-┌──────────────────────────┐  referenced by    │
-│ Agentic session evidence │  ─────────────────┘
-│  on gitCommit.           │
-└──────────────────────────┘
-```
+The model has two building blocks and a set of process-specific implementations:
+
+- **Session log artifacts (BOM)** — the raw agent timeline of each session, persisted in searchable durable storage.
+- **Agentic session evidence** — one generic, in-toto based provenance model that carries the provider stack, session identifiers, session log references, tools, context artifacts, result, owner and reviewers.
+- **Implementations** — each agentic process specializes the generic evidence with its own `predicateType`, subject and process-specific fields: `agentic-code-development`, `agentic-pr-review` and `agentic-alignment-check`.
+
+Every implementation references the session logs it produced (`sessionsLogs[].uri` + `digest`) and is attached to an SDLC subject — a git commit, an artifact digest, an application version, or the session log artifact itself in the case of an alignment check.
 
 ### 1. Session log (BOM)
 
