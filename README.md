@@ -5,7 +5,25 @@ All agentic processes can be documented using this standard. We focus examples o
 
 This repository defines how to bind agent session information to SDLC entities (commits, artifacts, application versions) so organizations can govern their AI-assisted work with the same rigor as traditional release process.
 
-Entity definitions live under [spec/](./spec/). 
+Entity definitions live under [spec/](./spec/).
+
+## Conventions
+
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this repository are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174) when, and only when, they appear in all capitals.
+
+Field tables use a **Required** column (`yes` / `no` / `conditional`) for whether a field is present. RFC 2119 words appear in **Constraints** and in prose.
+
+JSON field names defined by this standard use **camelCase**.
+
+### Naming conventions
+
+Two terms carry most of the model, and they are not interchangeable.
+
+**Session** — a single agent run, from the agent's point of view. Whatever a harness calls a conversation, chat, thread, or run is a session here: one IDE conversation, one review-bot invocation, one support exchange. A session is captured as a [session log](spec/agentic-session-log.md) and identified by `sessionId`. Harness-native names for the same thing (for example Cursor `conversation_id`) MAY appear on timeline events and keep the producer's spelling, but `sessionId` is the identifier this standard searches on.
+
+**Process** — the value unit, from the organization's point of view: the work whose outcome someone is accountable for. A process aggregates every session that contributed to one outcome — all coding sessions that yielded a commit, all review sessions on a pull request, a single customer-support case — and its outcome is the evidence **subject** (typically a git commit). One process MAY contain many sessions; one session belongs to one process. Process-level facts live on [process evidence](spec/agentic-process-evidence.md): `traceId`, `processSummary`, `result`, start and end timestamps, with `sessionsLogs` pointing at the sessions it covers.
+
+Rule of thumb: if a fact is about what the agent did in one run, it belongs to a session; if it is about the outcome being governed, it belongs to the process.
 
 ---
 
@@ -35,7 +53,7 @@ This standard enables:
 | Capability                       | What it unlocks                                                                                                                                                                                                                                                                                                                         | usage examples                                                                                                                                 |
 | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Troubleshooting & monitoring** | Trace agent sessions back to the commit or release they affected, and keep the logs in their correct context for as long as they could be needed                                                                                                                                                                                        | Supply chain traceability: MCP server is disclosed as malicious — search logs by `tools` and follow `commit` to every release that shipped it. |
-| **Policy-as-code validation**    | Automatically check harnesses, models, tools, owners, and outcomes. Check that an agentic session: has evidence that exists, is signed, and is relevant (the SDLC entity is the subject); used approved policy documents as context; ran with approved agents and models; was reviewed by a human, and by whom; has a named human owner | A package is blocked from production because a merge commit ran on a non-allowlisted model and has no named `owner`.                           |
+| **Policy-as-code validation**    | Automatically check harnesses, models, tools, owners, and outcomes. Check that an agentic process: has evidence that exists, is signed, and is relevant (the SDLC entity is the subject); used approved policy documents as context; ran with approved agents and models; was reviewed by a human, and by whom; has a named human owner | A package is blocked from production because a merge commit ran on a non-allowlisted model and has no named `owner`.                           |
 | **Human oversight**              | Allow optimization of human review to only when risk is identified, or when human oversight was missing from the process                                                                                                                                                                                                                | 235 of 240 commits are `ALIGNED` ; the 5 `MISALIGNED` on pricing require additional approval from the pricing features owner.                  |
 | **Regulatory alignment**         | Persist process logs for retention windows (e.g. EU AI Act Art. 19: ≥ 6 months) and link them to the development process, so missing human oversight becomes identifiable                                                                                                                                                               | ---                                                                                                                                            |
 
@@ -58,6 +76,7 @@ The model has two building blocks and a set of process-specific implementations:
 
 Every implementation references the session logs it produced (`sessionsLogs[].uri` + `digest`) and is attached to an SDLC subject — a git commit, an artifact digest, an application version, or the session log artifact itself in the case of an alignment check.
 
+
 ### 1. Session log (BOM)
 
 The **agent session trace** relevant to the agentic session — prompts, tool uses, responses, timestamps.
@@ -69,7 +88,7 @@ The **agent session trace** relevant to the agentic session — prompts, tool us
 | **Cardinality**           | Many session logs per commit; one commit per session log (the commit that session created/updated) |
 | **Type**                  | Generic artifact                                                                                   |
 | **Location**              | Persistent storage with search capabilities                                                        |
-| **Searchable Attributes** | `agent`, `tools`, `commit`, `session_id` (and optionally `parent_session_id`)                      |
+| **Searchable Attributes** | `agent`, `tools`, `commit`, `sessionId` (and optionally `parentSessionId`)                    |
 | **Used for**              | Deep troubleshooting                                                                               |
 | **Retention**             | Aligned to release retention (minimum of 6 months according to EU regulation for certain software)  |
 
@@ -79,20 +98,20 @@ The **agent session trace** relevant to the agentic session — prompts, tool us
 - Produced and uploaded by the [Agent runtime tool](spec/agent-runtime-tool.md) on commit
 - Referenced from AI Process evidence via `sessionsLogs[].uri` + `sessionsLogs[].digest`
 
-### 2. Agentic Session evidence
+### 2. Agentic process evidence
 
-**Provenance evidence** whose subject is the SDLC entity the agent handled—typically a **git commit**; for release approval, the **application release,** and for an artifact, the **artifact digest**.
+**Provenance evidence** whose subject is the SDLC entity the process produced—typically a **git commit**; for release approval, the **application release,** and for an artifact, the **artifact digest**. One process evidence covers every session that contributed to that subject.
 
-The agentic session evidence should only be created once the agentic process completes, e.g. code is committed, code review is completed, release was promoted, alignment check done. 
+The agentic process evidence should only be created once the agentic process completes, e.g. code is committed, code review is completed, release was promoted, alignment check done. 
 
 
 
 
 | Attribute         | Guidance                                                                                                                                                                        |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Schema**        | [Agentic session evidence](spec/agentic-session-evidence.md)                                                                                                                    |
+| **Schema**        | [Agentic process evidence](spec/agentic-process-evidence.md)                                                                                                                    |
 | **predicateType** | e.g. `https://jfrog.com/evidence/agentic-code-review`, `https://jfrog.com/evidence/agentic-dev-process`                                                                         |
-| **Contains**      | Provider (harness / agent / LLMs), session IDs, session logs, tools, context artifacts, result, intents, summary, owner, reviewers, timestamps and process relevant custom data |
+| **Contains**      | Provider (harness / agent / LLMs), process id (`traceId`), session logs, tools, context artifacts, result, intents, summary, owner, reviewers, timestamps and process-specific custom data |
 | **Used for**      | Provenance on the agentic process allowing for Policy checks and auditing                                                                                                       |
 | **Retention**     | Aligned to release retention                                                                                                                                                    |
 
@@ -111,7 +130,7 @@ High level process flow:
 1. Collect relevant session logs
 2. Extract provenance fields
 3. Upload session logs to durable storage and ensure searchability
-4. Upload git-commit agentic session evidence that references those logs and process provenance
+4. Upload git-commit agentic process evidence that references those logs and process provenance
 
 The evidence should also contain any context documents used for developing the code. 
 
@@ -119,7 +138,7 @@ The runtime tool should be active for every agentic SDLC flow you intend to gove
 
 #### 3.2. Alignment Violations evidence
 
-Runs at desired pipeline steps (Code Commit/PR review/release promotion/other) for agentically checking alignment of an agentic session (e.g. agentic development session) to the organization policies and for flagging high-risk intents.
+Runs at desired pipeline steps (Code Commit/PR review/release promotion/other) for agentically checking alignment of an agentic process (and the sessions inside it) to the organization policies and for flagging high-risk intents.
 
 `predicateType`: `https://jfrog.com/evidence/agentic-alignment/v1` 
 This process collects existing relevant session logs (git commit/PR commits/application release session logs) compares session logs against an intent/policy resource(s) and records `ALIGNED` | `MISALIGNED` plus violation summaries. 
@@ -146,7 +165,7 @@ Evidence follows [in-toto Statement v1](https://in-toto.io/). Minimum subject + 
 | `_type`                              | `https://in-toto.io/Statement/v1`                                                            |
 | `predicateType`                      | Process kind (`agentic-dev-process`, `agentic-code-review`, `agentic-alignment`, …)          |
 | `createdAt` / `createdBy`            | Freshness and creator identity                                                               |
-| `predicate.`*                        | See field tables in `[spec/agentic-session-evidence.md](./spec/agentic-session-evidence.md)` |
+| `predicate.`*                        | See field tables in `[spec/agentic-process-evidence.md](./spec/agentic-process-evidence.md)` |
 
 
 We recommend signing the evidence using DSSE ([https://github.com/secure-systems-lab/dsse](https://github.com/secure-systems-lab/dsse)).
@@ -154,10 +173,10 @@ We recommend signing the evidence using DSSE ([https://github.com/secure-systems
 **Predicate highlights for policy and humans:**
 
 - **provider stack** — harness, agent id/name/version, requested vs resolved language models
-- **sessionId** + **sessionsLogs** — correlate and download full chat/tool timeline  
+- **traceId** + **sessionsLogs** — identify the process and download every session timeline it covers  
 - **tools** — list of used tools for allowing for blacklist / allowlist checks  
 - **contextArtifacts** — policies, guidelines, prior logs (uri and/or inline `data` + digest)  
-- **result**, **intents**, **processSummary** — to be used by automation gates and human review  
+- **result** (`COMPLETED` / `FAILED` / `CANCELLED` on process evidence; `ALIGNED` / `MISALIGNED` on alignment evidence), **intents**, **processSummary** — automation gates and human review  
 - **owner** / **reviewers** — accountability and oversight  
 - **custom** — process-specific data (e.g. `baseCommit`, alignment information, requirements issues, change profile)
 
@@ -169,7 +188,7 @@ We recommend signing the evidence using DSSE ([https://github.com/secure-systems
 
 1. **Pick subjects** — Start with `git commit` for development and review; extend to application release promotion or approval.
 2. **Instrument the runtime** — Ensure the agent harness emits a session timeline (hooks or equivalent) and the Agent runtime tool flushes logs + evidence appropriately (e.g. on commit for development process).
-3. **Store session logs** — Persist the session logs and enable minimal searchable attributes (`tools`, `agent`, `commit`, `session_id`) so you can find all sessions that used a compromised tool or flagged policy issue.
+3. **Store session logs** — Persist the session logs and enable minimal searchable attributes (`tools`, `agent`, `commit`, `sessionId`) so you can find all sessions that used a compromised tool or flagged policy issue.
 4. **Publish AI Process evidence** — Sign and attach the in-toto statement to the commit.
 5. **Create policy-as-code** — Whitelist harnesses, agents, LLMs; require owners/reviewers; gate on `result` and alignment verdicts.
 6. **Route exceptions to humans** — Use `reviewers`, and when available `intents` and `processSummary`, and session log URIs for rapid approval when policy cannot decide.
@@ -186,7 +205,7 @@ Agent runtime tool  ──►  upload Session log artifact(s)
         │
         │  on commit
         ▼
-Build Agentic session evidence (subject = git commit)
+Build Agentic process evidence (subject = git commit)
         │
         ├─► optional: Alignment evidence vs intents policy (subject = session log artifact)
         │
@@ -222,7 +241,7 @@ Policy engine + human review / audit drill-down
 
 | Path                       | Description                                                                               |
 | -------------------------- | ----------------------------------------------------------------------------------------- |
-| `[spec/](./spec/)`         | session log, agentic session evidence, agent identifier, alignment evidence, runtime tool |
+| `[spec/](./spec/)`         | session log, agentic process evidence, agent identifier, alignment evidence, runtime tool |
 | `[README.md](./README.md)` | Orientation and adoption guide (this file)                                                |
 
 
@@ -237,4 +256,4 @@ Policy engine + human review / audit drill-down
 
 ## Status
 
-Working draft toward a shared **agentic session evidence** practice for SDLC governance. Feedback and implementations should align field names and predicate types with `[spec/](./spec/)` so evidence remains interoperable across harnesses and aggregators.
+Working draft toward a shared **agentic process evidence** practice for SDLC governance. Feedback and implementations should align field names and predicate types with `[spec/](./spec/)` so evidence remains interoperable across harnesses and aggregators.
