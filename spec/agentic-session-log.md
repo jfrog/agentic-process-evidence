@@ -29,7 +29,7 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
 
 ```json
 {
-  "conversationId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "parentSessionId": "4o7g54cd-8957-7503-45ga-495867457986",
   "subject": {"gitCommit": "bf02510c8ce0b804a099797510af"},
   "provider": {
@@ -56,7 +56,8 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
       "ts": "2026-04-08T08:51:02.114Z",
       "hook_event_name": "beforeSubmitPrompt",
       "prompt": "Implement rate limiting on /api/orders",
-      "conversationId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "conversation_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "cwd": "/Users/dev/gh-org/gh-repo",
       "workspace_roots": ["/Users/dev/gh-org/gh-repo"]
     },
@@ -74,7 +75,7 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
       "path_hashes": {
         "/Users/dev/gh-org/gh-repo/src/orders/rate_limit.py": null
       },
-      "conversationId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
     },
     {
       "eventId": "evt_01HZX9K2M3N4P5Q6R7S8T1",
@@ -86,7 +87,7 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
       "path_hashes": {
         "/Users/dev/gh-org/gh-repo/src/orders/rate_limit.py": "e3b0c44298fc1c149afbf4c8996fb924..."
       },
-      "conversationId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
     },
     {
       "eventId": "evt_01HZX9K2M3N4P5Q6R7S8T2",
@@ -94,13 +95,13 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
       "ts": "2026-04-08T08:52:01.880Z",
       "hook_event_name": "afterAgentResponse",
       "text": "Added token-bucket rate limiting on /api/orders.",
-      "conversationId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
     },
     {
       "eventId": "evt_01HZX9K2M3N4P5Q6R7S8T3",
       "event": "processEnd",
       "ts": "2026-04-08T08:52:05.010Z",
-      "conversationId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
     }
   ]
 }
@@ -108,8 +109,8 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
 
 Notes:
 
-- Standard fields on the log and on each timeline event use camelCase (`conversationId`, `eventId`, `event`, `ts`).
-- Additional harness hook fields SHOULD be preserved with the producer’s original names (e.g. Cursor `hook_event_name`, `tool_name`, `path_hashes`).
+- Standard fields on the log and on each timeline event use camelCase (`sessionId`, `eventId`, `event`, `ts`).
+- Additional harness hook fields SHOULD be preserved with the producer’s original names (e.g. Cursor `hook_event_name`, `tool_name`, `path_hashes`, `conversation_id`). Cursor `conversation_id` is a harness extra, not the standard session id.
 - `path_hashes` on tool events is optional (pre/post tool-use fingerprints).
 - `processEnd` (or a harness `stop` equivalent) triggers immediate flush to durable storage.
 
@@ -119,7 +120,7 @@ Notes:
 
 | Field | Type | Required | Constraints | Description | Usages |
 |---|---|---|---|---|---|
-| `conversationId` | String | yes | non-empty | Session / conversation identifier | Search; correlate to evidence `traceId` when they match |
+| `sessionId` | String | yes | non-empty | Session identifier | Search; correlate to evidence `traceId` when they match |
 | `parentSessionId` | String | no | non-empty when present | Parent session / run id | Locate related sessions |
 | `subject` | Object | no | subject keys (e.g. `gitCommit`) | Subject produced or handled | Locate logs by commit / version |
 | `provider` | Provider | yes | see [Provider](./agent-identifier.md) | Harness, agent, and language models for this log | Search; allowlist checks |
@@ -134,7 +135,7 @@ Standard fields on each entry of `timeline`. Additional harness-specific propert
 | `eventId` | String | yes | unique within the log | Event identifier | Dedup; citation |
 | `event` | String | yes | non-empty; SHOULD be a [Timeline event kind](#timeline-event-kind) when one applies | Kind of event | Filter tool uses vs prompts |
 | `ts` | Timestamp | yes | ISO 8601 | Event time | Ordering; duration |
-| `conversationId` | String | no | SHOULD match the log `conversationId` | Session id repeated on the event | Harness correlation |
+| `sessionId` | String | no | SHOULD match the log `sessionId` | Session id repeated on the event | Harness correlation |
 
 ## Timeline event kind
 
@@ -157,7 +158,7 @@ Used to identify breached components and locate related processes:
 | `tools` | Tool array | no | 0..*; see [Tool](./agentic-session-evidence.md#tool) | Tools used |
 | `agent` | Agent | no | from `provider.agent`; see [Agent](./agent-identifier.md#agent) | Agent metadata |
 | `subject` | Object | no | subject keys | Locating change commit(s) / other subjects |
-| `conversationId` | String | yes | same as log `conversationId` | Run / session id |
+| `sessionId` | String | yes | same as log `sessionId` | Run / session id |
 | `parentSessionId` | String | no | | Parent session / run id |
 
 ## Out of scope

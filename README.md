@@ -108,7 +108,7 @@ The **agent session trace** relevant to the agentic session — prompts, tool us
 | **Cardinality**           | Many session logs per commit; one commit per session log (the commit that session created/updated) |
 | **Type**                  | Generic artifact                                                                                   |
 | **Location**              | Persistent storage with search capabilities                                                        |
-| **Searchable Attributes** | `agent`, `tools`, `commit`, `conversationId` (and optionally `parentSessionId`)                    |
+| **Searchable Attributes** | `agent`, `tools`, `commit`, `sessionId` (and optionally `parentSessionId`)                    |
 | **Used for**              | Deep troubleshooting                                                                               |
 | **Retention**             | Aligned to release retention (minimum of 6 months according to EU regulation for certain software)  |
 
@@ -208,7 +208,7 @@ We recommend signing the evidence using DSSE ([https://github.com/secure-systems
 
 1. **Pick subjects** — Start with `git commit` for development and review; extend to application release promotion or approval.
 2. **Instrument the runtime** — Ensure the agent harness emits a session timeline (hooks or equivalent) and the Agent runtime tool flushes logs + evidence appropriately (e.g. on commit for development process).
-3. **Store session logs** — Persist the session logs and enable minimal searchable attributes (`tools`, `agent`, `commit`, `conversationId`) so you can find all sessions that used a compromised tool or flagged policy issue.
+3. **Store session logs** — Persist the session logs and enable minimal searchable attributes (`tools`, `agent`, `commit`, `sessionId`) so you can find all sessions that used a compromised tool or flagged policy issue.
 4. **Publish AI Process evidence** — Sign and attach the in-toto statement to the commit.
 5. **Create policy-as-code** — Whitelist harnesses, agents, LLMs; require owners/reviewers; gate on `result` and alignment verdicts.
 6. **Route exceptions to humans** — Use `reviewers`, and when available `intents` and `processSummary`, and session log URIs for rapid approval when policy cannot decide.
