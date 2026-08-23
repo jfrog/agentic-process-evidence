@@ -4,8 +4,6 @@ This page defines the **Provider** type and its nested types **Harness**, **Agen
 
 Provides data for full traceability and helps mitigate supply-chain style attacks: **harness → agent → language model**.
 
-JSON field names defined by this standard use **camelCase**.
-
 **Required** in the tables below: `yes` = must be present and non-empty; `no` = optional. **MUST**, **SHOULD**, **MAY**, and related words follow [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) as stated in [README Conventions](../README.md#conventions).
 
 ## Provider

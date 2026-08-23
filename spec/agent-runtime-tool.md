@@ -16,7 +16,7 @@ Monitors agent sessions and, on a **commit event**:
 
 | Entity | Relationship |
 |---|---|
-| [Agentic session log](./agentic-session-log.md) | Payload / timeline schema for the session artifacts |
+| [Agentic session log](./agentic-session-log.md) | Payload / timeline schema of the agentic session |
 | [Agentic process evidence](./agentic-process-evidence.md) | Provenance statement uploaded on the SDLC entity the process produced (commit, artifact, or release) |
-| [Alignment evidence](./alignment-evidence.md) | An optional second statement on a session log from the same commit-time collection indicating policy violations |
+| [Alignment evidence](./alignment-evidence.md) | An optional second statement on a session log(s) from the same commit-time collection indicating policy violations |
 | [Agent identifier](./agent-identifier.md) | Provider stack recorded on logs and evidence |
