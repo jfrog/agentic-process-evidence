@@ -15,13 +15,15 @@ Field tables use a **Required** column (`yes` / `no` / `conditional`) for whethe
 
 JSON field names defined by this standard use **camelCase**.
 
-### Session
+### Naming conventions
 
-A **session** is one agent run: the prompts, tool uses, responses, and timestamps of that run. It is stored as a [session log](spec/agentic-session-log.md) and identified by `sessionId`.
+Two terms carry most of the model, and they are not interchangeable.
 
-An **agentic process** is the governed unit of work that produces or handles an SDLC subject (typically a git commit). One process MAY include many sessions. Session evidence describes the process (`traceId`, `processSummary`) and points at session logs via `sessionsLogs`.
+**Session** — a single agent run, from the agent's point of view. Whatever a harness calls a conversation, chat, thread, or run is a session here: one IDE conversation, one review-bot invocation, one support exchange. A session is captured as a [session log](spec/agentic-session-log.md) and identified by `sessionId`. Harness-native names for the same thing (for example Cursor `conversation_id`) MAY appear on timeline events and keep the producer's spelling, but `sessionId` is the identifier this standard searches on.
 
-**Chat** and **conversation** are not types in this standard. Harness-native fields such as Cursor `conversation_id` MAY appear on timeline events and MUST keep the producer’s names; they are not a substitute for `sessionId`.
+**Process** — the value unit, from the organization's point of view: the work whose outcome someone is accountable for. A process aggregates every session that contributed to one outcome — all coding sessions that yielded a commit, all review sessions on a pull request, a single customer-support case — and its outcome is the evidence **subject** (typically a git commit). One process MAY contain many sessions; one session belongs to one process. Process-level facts live on [session evidence](spec/agentic-session-evidence.md): `traceId`, `processSummary`, `result`, start and end timestamps, with `sessionsLogs` pointing at the sessions it covers.
+
+Rule of thumb: if a fact is about what the agent did in one run, it belongs to a session; if it is about the outcome being governed, it belongs to the process.
 
 ---
 
