@@ -56,7 +56,6 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
       "ts": "2026-04-08T08:51:02.114Z",
       "hook_event_name": "beforeSubmitPrompt",
       "prompt": "Implement rate limiting on /api/orders",
-      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "conversation_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "cwd": "/Users/dev/gh-org/gh-repo",
       "workspace_roots": ["/Users/dev/gh-org/gh-repo"]
@@ -75,7 +74,7 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
       "path_hashes": {
         "/Users/dev/gh-org/gh-repo/src/orders/rate_limit.py": null
       },
-      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      "conversation_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
     },
     {
       "eventId": "evt_01HZX9K2M3N4P5Q6R7S8T1",
@@ -87,7 +86,7 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
       "path_hashes": {
         "/Users/dev/gh-org/gh-repo/src/orders/rate_limit.py": "e3b0c44298fc1c149afbf4c8996fb924..."
       },
-      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      "conversation_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
     },
     {
       "eventId": "evt_01HZX9K2M3N4P5Q6R7S8T2",
@@ -95,13 +94,12 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
       "ts": "2026-04-08T08:52:01.880Z",
       "hook_event_name": "afterAgentResponse",
       "text": "Added token-bucket rate limiting on /api/orders.",
-      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      "conversation_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
     },
     {
       "eventId": "evt_01HZX9K2M3N4P5Q6R7S8T3",
       "event": "processEnd",
-      "ts": "2026-04-08T08:52:05.010Z",
-      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      "ts": "2026-04-08T08:52:05.010Z"
     }
   ]
 }
@@ -109,8 +107,8 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
 
 Notes:
 
-- Standard fields on the log and on each timeline event use camelCase (`sessionId`, `eventId`, `event`, `ts`).
-- Additional harness hook fields SHOULD be preserved with the producer’s original names (e.g. Cursor `hook_event_name`, `tool_name`, `path_hashes`, `conversation_id`). Cursor `conversation_id` is a harness extra, not the standard session id.
+- Log envelope uses camelCase (`sessionId`, `parentSessionId`). `sessionId` MUST NOT be copied onto timeline events.
+- Timeline entries are captured harness events. Standard overlay fields are `eventId`, `event`, `ts`. All other properties SHOULD keep the producer’s original names (e.g. Cursor `hook_event_name`, `tool_name`, `path_hashes`, `conversation_id`).
 - `path_hashes` on tool events is optional (pre/post tool-use fingerprints).
 - `processEnd` (or a harness `stop` equivalent) triggers immediate flush to durable storage.
 
@@ -128,14 +126,13 @@ Notes:
 
 ## Timeline event
 
-Standard fields on each entry of `timeline`. Additional harness-specific properties MAY be present and MUST NOT be renamed by this spec.
+Captured harness events, plus a small overlay this standard owns. Additional producer properties MAY be present and MUST NOT be renamed. Do not add log `sessionId` here; correlate via the envelope.
 
 | Field | Type | Required | Constraints | Description | Usages |
 |---|---|---|---|---|---|
 | `eventId` | String | yes | unique within the log | Event identifier | Dedup; citation |
 | `event` | String | yes | non-empty; SHOULD be a [Timeline event kind](#timeline-event-kind) when one applies | Kind of event | Filter tool uses vs prompts |
 | `ts` | Timestamp | yes | ISO 8601 | Event time | Ordering; duration |
-| `sessionId` | String | no | SHOULD match the log `sessionId` | Session id repeated on the event | Harness correlation |
 
 ## Timeline event kind
 
