@@ -2,19 +2,22 @@
 
 Provenance evidence on the agentic process. Enables rapid human and policy-as-code approval.
 
-References the [session logs](./agentic-session-log.md) of every session in the process and attests on the process in which they were generated. The evidence **subject** is the process outcome, typically a `gitCommit`. One process evidence MAY reference many session logs.
+References the [session logs](./agentic-session-log.md) of every session in the process and attests on the process in which they were generated. The evidence **subject** is the process outcome: typically an SDLC entity (`gitCommit`, application version, artifact digest). When the process *is* a single session (no SDLC artifact), the subject MAY be that session (`sessionId` / the session-log artifact). One process evidence MAY reference many session logs.
 
 JSON field names defined by this standard use **camelCase**.
 
 ## Subject
 
-The entity produced or handled by the agentic process:
+The entity produced or handled by the agentic process — the value unit from [Naming conventions](../README.md#naming-conventions).
 
 | Process | Subject |
 |---|---|
 | Code development / review | git commit |
 | Version release approval | Application version |
 | Artifact promotion | Artifact digest |
+| Single-session process (support case, standalone agent run, and similar) | Session log (`sessionId`) |
+
+Use the session as subject when there is no SDLC entity to hang the process on, or when the accountable outcome *is* that one session. Then `sessionsLogs` SHOULD be omitted — the subject already identifies the log. Use an SDLC subject when several sessions contributed to one commit, version, or artifact.
 
 ## Storage attributes
 
@@ -60,7 +63,7 @@ The entity produced or handled by the agentic process:
         ]
       }
     ],
-    "traceId": "trace id | ci_job_run_uri | vendor session id",
+    "traceId": "process id | ci_job_run_uri",
     "sessionsLogs": [
       {
         "uri": "session log url",
@@ -240,8 +243,8 @@ Recommended values for `tags`. Other tags MAY be used.
 | Field | Type | Required | Constraints | Description | Usages |
 |---|---|---|---|---|---|
 | `providers` | Provider array | yes | ≥1; see [Provider](./agent-identifier.md) | Agentic provider stacks used in the process | Verify approved / whitelisted harness |
-| `traceId` | String | no | non-empty when present | Unique identifier of the agentic process | Correlate to original logs; identify runner |
-| `sessionsLogs` | ResourceDescriptor array | no | 0..*; see [Resource descriptor](#resource-descriptor); each `digest` SHOULD include `sha256` | Links to session logs (full agentic chat context) | Download logs for review |
+| `traceId` | String | no | non-empty when present | Unique identifier of the agentic process | Correlate sessions to the process; identify runner |
+| `sessionsLogs` | ResourceDescriptor array | no | 0..*; see [Resource descriptor](#resource-descriptor); each `digest` SHOULD include `sha256`; omit when the subject is the session log itself | Links to session logs (full agentic chat context) | Download logs for review |
 | `tools` | Tool array | no | 0..*; see [Tool](#tool) | Used tools | Check for blacklisted tools |
 | `contextArtifacts` | ContextArtifact array | no | 0..*; see [Context artifact](#context-artifact) | Artifacts used by the process (policies, instructions, prior logs, guidelines, …) | Input provenance |
 | `custom` | Object | no | process-specific keys | Custom information for the specific agentic process | Process-specific checks |
