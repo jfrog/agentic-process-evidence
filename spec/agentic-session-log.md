@@ -2,7 +2,7 @@
 
 Persistence and search model for agentic session logs stored as [Session log (BOM)](./agentic-session-log.md) artifacts.
 
-JSON field names defined by this standard use **camelCase**. Harness-native hook fields copied into `timeline[]` MAY keep the producer’s original names.
+Harness-native hook fields copied into `timeline[]` MAY keep the producer’s original names.
 
 ## Purpose
 
@@ -31,7 +31,7 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
 {
   "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "parentSessionId": "4o7g54cd-8957-7503-45ga-495867457986",
-  "subject": {"gitCommit": "bf02510c8ce0b804a099797510af"},
+  "affectedEntities": [{"gitCommit": "bf02510c8ce0b804a099797510af"}],
   "provider": {
     "harness": {
       "name": "cursor",
@@ -107,8 +107,7 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
 
 Notes:
 
-- Log envelope uses camelCase (`sessionId`, `parentSessionId`). `sessionId` MUST NOT be copied onto timeline events.
-- Timeline entries are captured harness events. Standard overlay fields are `eventId`, `event`, `ts`. All other properties SHOULD keep the producer’s original names (e.g. Cursor `hook_event_name`, `tool_name`, `path_hashes`, `conversation_id`).
+- Timeline entries capture harness events. Standard overlay fields are `eventId`, `event`, `ts`. All other properties SHOULD keep the producer’s original names (e.g. Cursor `hook_event_name`, `tool_name`, `path_hashes`, `conversation_id`).
 - `path_hashes` on tool events is optional (pre/post tool-use fingerprints).
 - `sessionEnd` (or a harness `stop` equivalent) triggers immediate flush to durable storage.
 
@@ -120,7 +119,7 @@ Notes:
 |---|---|---|---|---|---|
 | `sessionId` | String | yes | non-empty | Session identifier | Search; correlate to a session log referenced from process evidence `sessionsLogs` |
 | `parentSessionId` | String | no | non-empty when present | Parent session / run id | Locate related sessions |
-| `subject` | Object | no | subject keys (e.g. `gitCommit`) | Subject produced or handled | Locate logs by commit / version |
+| `affectedEntities` | Object Array | no | subject keys (e.g. `gitCommit`) | entities produced or handled | Locate logs by commit / version |
 | `provider` | Provider | yes | see [Provider](./agent-identifier.md) | Harness, agent, and language models for this log | Search; allowlist checks |
 | `timeline` | TimelineEvent array | yes | ≥1; see [Timeline event](#timeline-event) | Ordered hook events | Human review of the session |
 

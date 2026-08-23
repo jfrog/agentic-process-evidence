@@ -4,7 +4,6 @@ Provenance evidence on the agentic process. Enables rapid human and policy-as-co
 
 References the [session logs](./agentic-session-log.md) of every session in the process and attests on the process in which they were generated. The evidence **subject** is the process outcome: typically an SDLC entity (`gitCommit`, application version, artifact digest). When the process *is* a single session (no SDLC artifact), the subject MAY be that session (`sessionId` / the session-log artifact). One process evidence MAY reference many session logs.
 
-JSON field names defined by this standard use **camelCase**.
 
 ## Subject
 
@@ -17,7 +16,7 @@ The entity produced or handled by the agentic process — the value unit from [N
 | Artifact promotion | Artifact digest |
 | Single-session process (support case, standalone agent run, and similar) | Session log (`sessionId`) |
 
-Use the session as subject when there is no SDLC entity to hang the process on, or when the accountable outcome *is* that one session. Then `sessionsLogs` SHOULD be omitted — the subject already identifies the log. Use an SDLC subject when several sessions contributed to one commit, version, or artifact.
+Use the session as subject when there is no SDLC entity to hang the process on, or when the accountable outcome *is* that one session. 
 
 ## Storage attributes
 
@@ -125,9 +124,7 @@ Provider identity fields are defined in [`agent-identifier.md`](./agent-identifi
 
 ## Digest set
 
-`digest` is a **DigestSet**: a JSON object mapping algorithm name to a lowercase hex-encoded digest string. At least one entry is required.
-
-On `subject[].digest` this is the in-toto Statement v1 type. Predicate fields that name a digest (`sessionsLogs[].digest`, `contextArtifacts[].digest`, `baseCommit.digest`) reuse the same shape so every digest in this spec is one type.
+`digest` in this spec is the in-toto Statement v1 type [digest_set](https://github.com/in-toto/attestation/blob/main/spec/v1/digest_set.md). Predicate fields that name a digest (`subject[].digest` , `sessionsLogs[].digest`, `contextArtifacts[].digest`, `baseCommit.digest`) reuse the same shape so every digest in this spec is one type.
 
 ```json
 {
@@ -141,18 +138,11 @@ On `subject[].digest` this is the in-toto Statement v1 type. Predicate fields th
 }
 ```
 
-| Algorithm key | Value | When to use |
-|---|---|---|
-| `gitCommit` | Git object id, as `git rev-parse` reports it | Git commit subjects |
-| `sha256` | SHA-256 of the artifact bytes | Generic artifacts (session logs, files, blobs) |
-
 Additional algorithm keys MAY be present (`sha512`, `sha1`, …) with the same meaning as in-toto. Unknown keys MUST be ignored by consumers that do not understand them.
-
-A DigestSet is not a single string.
 
 ## Resource descriptor
 
-A digest-linked reference to an artifact. Same idea as in-toto `ResourceDescriptor` (`uri` + `digest`); this spec uses only those two fields.
+A digest-linked reference to an artifact. Same idea as in-toto `ResourceDescriptor` (`uri` + `digest`); examples in this spec show only those two fields, but permits additional fields as detailed in the in-toto spec.
 
 ```json
 {
@@ -168,7 +158,7 @@ A digest-linked reference to an artifact. Same idea as in-toto `ResourceDescript
 | `uri` | String | yes | URI | Location of the artifact |
 | `digest` | DigestSet | yes | ≥1 algorithm key; see [Digest set](#digest-set) | Immutable identity of the bytes at `uri` |
 
-Used as `predicate.sessionsLogs` (ResourceDescriptor array) and as `custom.baseCommit`. `subject[]` uses the same `uri` + `digest` pair because that is in-toto Statement v1.
+See usage examples in `subject[]` (ResourceDescriptor array), `sessionsLogs[]` (ResourceDescriptor array) and in `custom.baseCommit`.
 
 ## Tool
 
@@ -190,7 +180,7 @@ Used as `predicate.tools` (Tool array) on [agentic process evidence](./agentic-p
 
 ## Context artifact
 
-A policy, guideline, instruction, or other document the process used as input. Extends a [Resource descriptor](#resource-descriptor) with labels and an optional inline body.
+A policy, guideline, instruction, or any other document the process used as input. Extends a [Resource descriptor](#resource-descriptor) with labels and an optional inline body.
 
 ```json
 {
@@ -258,13 +248,18 @@ Recommended values for `tags`. Other tags MAY be used.
 
 ## Process result
 
-Closed set for `predicate.result` on agentic process evidence (development, review, promotion, and similar process evidence — not alignment evidence). This is the outcome of the **process**, not of one session.
+`predicate.result` is the process result of an agentic process evidence (development, review, promotion, and similar process evidence — not alignment evidence). This is the outcome of the **process**, not of one session.
 
+Poossible values are
 | Value | Meaning |
 |---|---|
 | `COMPLETED` | Process finished successfully |
 | `FAILED` | Process ended unsuccessfully |
 | `CANCELLED` | Process stopped before completion |
+| `APPROVED` | A review Process approved its subject content |
+| `REJECTED` | A review Process rejected its subject content |
+| `ALIGNED` | Alignment check process completed with positive verdict |
+| `MISALIGNED` | Alignment check process completed with negative verdict  |
 
 ## Development process custom data
 
