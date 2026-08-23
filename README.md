@@ -13,6 +13,16 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 
 Field tables use a **Required** column (`yes` / `no` / `conditional`) for whether a field is present. RFC 2119 words appear in **Constraints** and in prose.
 
+JSON field names defined by this standard use **camelCase**.
+
+### Session
+
+A **session** is one agent run: the prompts, tool uses, responses, and timestamps of that run. It is stored as a [session log](spec/agentic-session-log.md) and identified by `sessionId`.
+
+An **agentic process** is the governed unit of work that produces or handles an SDLC subject (typically a git commit). One process MAY include many sessions. Session evidence describes the process (`traceId`, `processSummary`) and points at session logs via `sessionsLogs`.
+
+**Chat** and **conversation** are not types in this standard. Harness-native fields such as Cursor `conversation_id` MAY appear on timeline events and MUST keep the producer’s names; they are not a substitute for `sessionId`.
+
 ---
 
 ## Why this exists
