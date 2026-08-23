@@ -36,7 +36,7 @@ JSON field names defined by this standard use **camelCase**.
 | `agent` | Agent | no | see [Agent](#agent) | Agent running in the harness |
 | `languageModels` | LanguageModel array | no | 0..*; see [Language model](#language-model) | Language models involved in the run |
 
-Used as `predicate.providers` (Provider array) on [agentic session evidence](./agentic-session-evidence.md) — one entry per distinct stack in the process. Used as a single `provider` field on [alignment evidence](./alignment-evidence.md) and on [agentic session log](./agentic-session-log.md) payloads.
+Used as `predicate.providers` (Provider array) on [agentic process evidence](./agentic-process-evidence.md) — one entry per distinct stack in the process. Used as a single `provider` field on [alignment evidence](./alignment-evidence.md) and on [agentic session log](./agentic-session-log.md) payloads.
 
 ## Harness
 

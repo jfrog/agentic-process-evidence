@@ -4,7 +4,7 @@ Evidence based on the agentic process that improves control over **intent alignm
 
 `predicateType`: `https://jfrog.com/evidence/agentic-alignment/v1`
 
-JSON field names defined by this standard use **camelCase**. Shared predicate fields follow [agentic session evidence](./agentic-session-evidence.md) unless this page says otherwise.
+JSON field names defined by this standard use **camelCase**. Shared predicate fields follow [agentic process evidence](./agentic-process-evidence.md) unless this page says otherwise.
 
 ## Generation process
 
@@ -14,8 +14,8 @@ We do recommend that the alignment evidence subject be set to the session log ar
 
 On commit, the client-side agentic process:
 
-1. Collects all process logs (same path that creates development process evidence)
-2. Checks the customer intents-policy resource against the process logs
+1. Collects all session logs (same path that creates development process evidence)
+2. Checks the customer intents-policy resource against the session logs
 3. Emits evidence with verdict `ALIGNED` | `MISALIGNED` and a summary of problematic intents
 
 ## Example (session log as subject)
@@ -86,7 +86,7 @@ Provider identity uses the field names in [`agent-identifier.md`](./agent-identi
 
 ## Alignment result
 
-Closed set for `predicate.result` on alignment evidence. This is not the same enum as session evidence `COMPLETED` / `FAILED` / `CANCELLED`.
+Closed set for `predicate.result` on alignment evidence. This is not the same enum as process evidence `COMPLETED` / `FAILED` / `CANCELLED`.
 
 | Value | Meaning |
 |---|---|
@@ -99,8 +99,8 @@ Closed set for `predicate.result` on alignment evidence. This is not the same en
 |---|---|---|---|---|---|
 | `provider` | Provider | yes | see [Provider](./agent-identifier.md) | Stack that performed the alignment check | Allowlist the checker |
 | `result` | String | yes | [Alignment result](#alignment-result) | Verdict | Gate promotion / require extra review |
-| `sessionsLogs` | ResourceDescriptor array | conditional | required (≥1) when the subject is an SDLC entity; omit when the subject is the evaluated session log; see [Resource descriptor](./agentic-session-evidence.md#resource-descriptor) | Logs covered by this verdict | Drill-down |
-| `contextArtifacts` | ContextArtifact array | yes | ≥1; see [Context artifact](./agentic-session-evidence.md#context-artifact); SHOULD include the intents policy (`tags` contains `policy`) | Policy documents used | Reproduce the check |
+| `sessionsLogs` | ResourceDescriptor array | conditional | required (≥1) when the subject is an SDLC entity; omit when the subject is the evaluated session log; see [Resource descriptor](./agentic-process-evidence.md#resource-descriptor) | Logs covered by this verdict | Drill-down |
+| `contextArtifacts` | ContextArtifact array | yes | ≥1; see [Context artifact](./agentic-process-evidence.md#context-artifact); SHOULD include the intents policy (`tags` contains `policy`) | Policy documents used | Reproduce the check |
 | `custom.violations` | String array | no | 0..*; SHOULD be present when `result` is `MISALIGNED` | Short violation descriptions | Human review |
 
 ## Alternative subject (SDLC entity)
@@ -138,7 +138,7 @@ When the gate acts on the SDLC entity rather than on an individual log — for e
 
 ## Notes
 
-- Subject in each alignment evidence is typically each session log included in the git commits as [agentic session evidence](./agentic-session-evidence.md)
+- Subject in each alignment evidence is typically each session log included in the git commits as [agentic process evidence](./agentic-process-evidence.md)
 - `contextArtifacts` should include the intents policy (uri and/or inline `data` + digest)
 - Intents analysis algorithms are out of scope; this entity defines the evidence envelope only
 - See [`agent-identifier.md`](./agent-identifier.md) for provider identity

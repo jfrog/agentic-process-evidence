@@ -1,8 +1,8 @@
-# Agentic Session Evidence
+# Agentic Process Evidence
 
 Provenance evidence on the agentic process. Enables rapid human and policy-as-code approval.
 
-References Agentic process session logs and attests on the process in which they were generated, with the evidence **subject** typically a `gitCommit`.
+References the [session logs](./agentic-session-log.md) of every session in the process and attests on the process in which they were generated. The evidence **subject** is the process outcome, typically a `gitCommit`. One process evidence MAY reference many session logs.
 
 JSON field names defined by this standard use **camelCase**.
 
@@ -26,7 +26,7 @@ The entity produced or handled by the agentic process:
 | **Usage** | Provenance evidence when auditors drill down into randomly selected releases |
 | **Retention** | As long as release is required |
 
-## Example (Development session evidence on a Code Commit subject)
+## Example (Development process evidence on a Code Commit subject)
 
 ```json
 {
@@ -183,7 +183,7 @@ A tool used during the agentic process (IDE action, MCP server, CLI, etc.).
 | `name` | String | yes | non-empty | Tool name as the harness reports it |
 | `version` | String | no | non-empty when present | Tool version as the producer reports it (not necessarily SemVer) |
 
-Used as `predicate.tools` (Tool array) on [agentic session evidence](./agentic-session-evidence.md), and as a searchable attribute on [agentic session log](./agentic-session-log.md).
+Used as `predicate.tools` (Tool array) on [agentic process evidence](./agentic-process-evidence.md), and as a searchable attribute on [agentic session log](./agentic-session-log.md).
 
 ## Context artifact
 
@@ -245,7 +245,7 @@ Recommended values for `tags`. Other tags MAY be used.
 | `tools` | Tool array | no | 0..*; see [Tool](#tool) | Used tools | Check for blacklisted tools |
 | `contextArtifacts` | ContextArtifact array | no | 0..*; see [Context artifact](#context-artifact) | Artifacts used by the process (policies, instructions, prior logs, guidelines, …) | Input provenance |
 | `custom` | Object | no | process-specific keys | Custom information for the specific agentic process | Process-specific checks |
-| `result` | String | yes | [Session result](#session-result) | Short process completion state | Validate positive completion / verdict |
+| `result` | String | yes | [Process result](#process-result) | Short process completion state | Validate positive completion / verdict |
 | `intents` | String array | no | 0..* | Short descriptions of intents identified in the process | Human oversight; agentic policy validation |
 | `processSummary` | String | no | | Summarized description of the process | Human oversight; agentic policy validation |
 | `owner` | String | yes | login or email | Login or email of the accountable user | Accountability; permissions |
@@ -253,9 +253,9 @@ Recommended values for `tags`. Other tags MAY be used.
 | `startTimestamp` | Timestamp | yes | ISO 8601 | Process start | Duration checks |
 | `endTimestamp` | Timestamp | yes | ISO 8601 | Process end | Duration checks |
 
-## Session result
+## Process result
 
-Closed set for `predicate.result` on agentic session evidence (development, review, promotion, and similar process evidence — not alignment evidence).
+Closed set for `predicate.result` on agentic process evidence (development, review, promotion, and similar process evidence — not alignment evidence). This is the outcome of the **process**, not of one session.
 
 | Value | Meaning |
 |---|---|

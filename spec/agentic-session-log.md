@@ -98,7 +98,7 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
     },
     {
       "eventId": "evt_01HZX9K2M3N4P5Q6R7S8T3",
-      "event": "processEnd",
+      "event": "sessionEnd",
       "ts": "2026-04-08T08:52:05.010Z"
     }
   ]
@@ -110,7 +110,7 @@ Notes:
 - Log envelope uses camelCase (`sessionId`, `parentSessionId`). `sessionId` MUST NOT be copied onto timeline events.
 - Timeline entries are captured harness events. Standard overlay fields are `eventId`, `event`, `ts`. All other properties SHOULD keep the producer’s original names (e.g. Cursor `hook_event_name`, `tool_name`, `path_hashes`, `conversation_id`).
 - `path_hashes` on tool events is optional (pre/post tool-use fingerprints).
-- `processEnd` (or a harness `stop` equivalent) triggers immediate flush to durable storage.
+- `sessionEnd` (or a harness `stop` equivalent) triggers immediate flush to durable storage.
 
 **Required** in the tables below: `yes` = must be present and non-empty; `no` = optional. **MUST**, **SHOULD**, **MAY**, and related words follow [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) as stated in [README Conventions](../README.md#conventions).
 
@@ -118,7 +118,7 @@ Notes:
 
 | Field | Type | Required | Constraints | Description | Usages |
 |---|---|---|---|---|---|
-| `sessionId` | String | yes | non-empty | Session identifier | Search; correlate to evidence `traceId` when they match |
+| `sessionId` | String | yes | non-empty | Session identifier | Search; correlate to a session log referenced from process evidence `sessionsLogs` |
 | `parentSessionId` | String | no | non-empty when present | Parent session / run id | Locate related sessions |
 | `subject` | Object | no | subject keys (e.g. `gitCommit`) | Subject produced or handled | Locate logs by commit / version |
 | `provider` | Provider | yes | see [Provider](./agent-identifier.md) | Harness, agent, and language models for this log | Search; allowlist checks |
@@ -144,7 +144,7 @@ Known values for the standard `event` field. Producers SHOULD use one of these w
 | `preToolUse` | Tool invocation about to run |
 | `postToolUse` | Tool invocation finished |
 | `afterAgentResponse` | Agent produced a response |
-| `processEnd` | Session finished; flush to durable storage |
+| `sessionEnd` | Session finished; flush to durable storage |
 
 ## Searchable attributes
 
@@ -152,7 +152,7 @@ Used to identify breached components and locate related processes:
 
 | Property | Type | Required | Constraints | Description |
 |---|---|---|---|---|
-| `tools` | Tool array | no | 0..*; see [Tool](./agentic-session-evidence.md#tool) | Tools used |
+| `tools` | Tool array | no | 0..*; see [Tool](./agentic-process-evidence.md#tool) | Tools used |
 | `agent` | Agent | no | from `provider.agent`; see [Agent](./agent-identifier.md#agent) | Agent metadata |
 | `subject` | Object | no | subject keys | Locating change commit(s) / other subjects |
 | `sessionId` | String | yes | same as log `sessionId` | Run / session id |
