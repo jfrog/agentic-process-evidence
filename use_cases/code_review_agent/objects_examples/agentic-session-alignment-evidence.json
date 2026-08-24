@@ -1,0 +1,54 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/b2c3d4e5-f6a7-8901-bcde-f12345678901.json",
+      "digest": {
+        "sha256": "1a9c4e2b7d80f3a6c5e192d8b0a47c3e1f6d5b90c2a8e4b7d3f1c0a9e8b75630"
+      }
+    }
+  ],
+  "predicateType": "https://jfrog.com/evidence/agentic-session-alignment/v1",
+  "predicate": {
+    "provider": {
+      "harness": {
+        "name": "github-actions",
+        "version": "2.322.0"
+      },
+      "agent": {
+        "id": "alignment-checker",
+        "name": "alignment-checker",
+        "version": "1.2.0"
+      },
+      "languageModels": [
+        {
+          "inferenceProvider": "anthropic/claude-sonnet-4",
+          "resolved": "anthropic/claude-sonnet-4-20250514"
+        }
+      ]
+    },
+    "contextArtifacts": [
+      {
+        "tags": ["policy"],
+        "uri": "https://myorg.jfrog.io/artifactory/policies/org-review-rubric.md",
+        "digest": {
+          "sha256": "6d2e8a1c4f90b3d7e5a192c0f8b46a3d1c7e5f80b2d4a8c6e0f3b1d9a8c54721"
+        }
+      }
+    ],
+    "custom": {
+      "baseCommit": {
+        "uri": "https://github.com/MYORG/orders/commit/1b94ebd1ef32a4be4480dc70ed8ec2c6d55a2a0c",
+        "digest": {
+          "gitCommit": "1b94ebd1ef32a4be4480dc70ed8ec2c6d55a2a0c"
+        }
+      }
+    },
+    "result": "ALIGNED",
+    "owner": "platform-agent-ops@myorg.com",
+    "startTimestamp": "2026-04-08T09:12:50.000Z",
+    "endTimestamp": "2026-04-08T09:13:02.000Z"
+  },
+  "createdAt": "2026-04-08T09:13:08.000Z",
+  "createdBy": "alignment-checker"
+}

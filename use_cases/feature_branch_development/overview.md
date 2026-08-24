@@ -44,8 +44,9 @@ It holds the human owner and reviwer (the same person in this case)
 
 ## Artifacts
 
-- Session log per agentic session
-- Process evidence on the commit
+- **agentic-session-log** — one per agentic session (incl. subagents)
+- **agentic-dev-process-evidence** — on the git commit
+- **agentic-session-alignment-evidence** — optional, per session log; produced on the server
 
 ## See also
 

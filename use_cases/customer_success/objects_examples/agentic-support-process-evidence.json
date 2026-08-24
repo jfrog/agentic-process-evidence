@@ -1,0 +1,61 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/c9e8d7f6-1111-2222-3333-444455556666.json",
+      "digest": {
+        "sha256": "8b4d1e7a2c90f5d3e6a182b9c0d47e3f1a6c5b80d2e8a4c7f3b1d0e9a8c64712"
+      }
+    }
+  ],
+  "predicateType": "https://jfrog.com/evidence/agentic-support-process/v1",
+  "predicate": {
+    "providers": [
+      {
+        "harness": {
+          "name": "support-desk",
+          "version": "4.2.0"
+        },
+        "agent": {
+          "id": "support-agent",
+          "name": "support-agent",
+          "version": "2.1.0"
+        },
+        "languageModels": [
+          {
+            "inferenceProvider": "openai/gpt-4.1",
+            "resolved": "openai/gpt-4.1-2025-04-14"
+          }
+        ]
+      }
+    ],
+    "traceId": "c9e8d7f6-1111-2222-3333-444455556666",
+    "tools": [
+      { "name": "Read", "version": "support-agent" },
+      { "name": "OrderLookup", "version": "support-agent" }
+    ],
+    "contextArtifacts": [
+      {
+        "tags": ["policy"],
+        "uri": "https://myorg.jfrog.io/artifactory/policies/support-refund-policy.md",
+        "digest": {
+          "sha256": "2f7c1a9e4b80d3c6e5a192f0d8b46c3a1e7d5f90b2c4a8e6d0f3b1c9a8e54730"
+        }
+      }
+    ],
+    "custom": {
+      "ticket": "SUP-8821",
+      "orderId": "44119"
+    },
+    "result": "COMPLETED",
+    "intents": [
+      "Determine refund eligibility for order 44119"
+    ],
+    "processSummary": "Autonomous support agent looked up order 44119, applied the 14-day refund policy, and denied the refund. Single session; no SDLC subject.",
+    "owner": "support-platform@myorg.com",
+    "startTimestamp": "2026-04-08T14:00:02.000Z",
+    "endTimestamp": "2026-04-08T14:00:19.000Z"
+  },
+  "createdAt": "2026-04-08T14:00:25.000Z",
+  "createdBy": "agent-runtime-tool"
+}

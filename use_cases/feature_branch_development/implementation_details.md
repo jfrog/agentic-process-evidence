@@ -112,7 +112,7 @@ Same evidence, later choke point. The runtime tool does not gate. The server doe
 
 ## Artifacts
 
-### Session log
+### agentic-session-log
 
 `[objects_examples/agentic-session-log.json](./objects_examples/agentic-session-log.json)`
 
