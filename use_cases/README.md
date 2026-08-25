@@ -5,7 +5,7 @@ Business goals an agentic **process** achieves. Normative field definitions stay
 
 | Use case                                                               | Process shape                                 | Subject               |
 | ---------------------------------------------------------------------- | --------------------------------------------- | --------------------- |
-| [Feature branch development](./feature_branch_development/overview.md) | Human + IDE agent; many sessions → one commit | git commit            |
+| [Code development](./code_development/overview.md) | Human + IDE agent; many sessions → one commit | git commit            |
 | [Code review agent](./code_review_agent/overview.md)                   | Review agent; automerge negligible; one session | git commit (reviewed) |
 | [Customer success](./customer_success/overview.md)                     | Autonomous agent; process = one session       | session log           |
 
