@@ -169,25 +169,9 @@ Business goals an agentic **process** achieves. Normative field definitions stay
 
 ### Integrate in a pipeline (typical flow example)
 
-```text
-Agent session (IDE / CI)
-        │
-        │  timeline events (prompt, tool use, response, stop)
-        ▼
-Agent runtime tool  ──►  upload Session log artifact(s)
-        │
-        │  on commit
-        ▼
-Build Agentic process evidence (subject = git commit)
-        │
-        ├─► optional: Alignment evidence vs intents policy (subject = session log artifact)
-        │
-        ▼
-Collect evidence of a release version
-        │
-        ▼
-Policy engine + human review / audit drill-down
-```
+*Editable source: [docs/diagrams/system_diagram.excalidraw](docs/diagrams/system_diagram.excalidraw) — open it at [excalidraw.com](https://excalidraw.com).*
+
+
 
 ### Implement or validate against the spec
 
