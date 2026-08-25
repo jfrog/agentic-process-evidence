@@ -64,7 +64,7 @@ By attaching **in-toto-style evidence** to git commits, artifacts and applicatio
 
 ## High-level model
 
-Agentic session evidence model: session log artifacts, the generic agentic session evidence, and its agentic-code-development, agentic-pr-review and agentic-alignment-check implementations
+![Agentic session evidence model: session log artifacts, the generic agentic session evidence, and its agentic-code-development, agentic-pr-review and agentic-alignment-check implementations](docs/diagrams/high-level-model.png)
 
 *Editable source: [docs/diagrams/high-level-model.excalidraw](docs/diagrams/high-level-model.excalidraw) — open it at [excalidraw.com](https://excalidraw.com).*
 
@@ -168,6 +168,8 @@ Business goals an agentic **process** achieves. Normative field definitions stay
 7. **Retain** — Keep session logs and evidence at least as long as release is relevant.
 
 ### Integrate in a pipeline (typical flow example)
+
+![Simple SDLC pipeline with agentic development process](docs/diagrams/system_diagram.png)
 
 *Editable source: [docs/diagrams/system_diagram.excalidraw](docs/diagrams/system_diagram.excalidraw) — open it at [excalidraw.com](https://excalidraw.com).*
 
