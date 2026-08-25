@@ -1,4 +1,4 @@
-# Code development - Overview
+# Human-in-the-loop code development - Overview
 
 ## Scenario
 
@@ -39,7 +39,7 @@ It holds the human owner and reviwer (the same person in this case)
 
 1. alignment check wrt policies
 2. mendatory context present in all sessions
-3. alignment check wrt taks information
+3. alignment check wrt task information
 4. human accountable information
 
 ## Artifacts

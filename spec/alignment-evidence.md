@@ -4,7 +4,7 @@ Evidence based on the agentic process that improves control over **intent alignm
 
 `predicateType`: `https://jfrog.com/evidence/agentic-alignment/v1`
 
-JSON field names defined by this standard use **camelCase**. Shared predicate fields follow [agentic process evidence](./agentic-process-evidence.md) unless this page says otherwise.
+Shared predicate fields follow [agentic process evidence](./agentic-process-evidence.md) unless this page says otherwise.
 
 ## Generation process
 

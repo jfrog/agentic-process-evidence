@@ -2,7 +2,7 @@
 
 ## Scenario
 
-The **code review agent** reviews a change and classifies it
+The **code review agent** reviews a change and classifies or approves it
 
 Typically one review session
 
@@ -18,13 +18,13 @@ Automerge **NEGLIGIBLE** changes. Keep signed evidence, session logs, alignment,
 
 That is the rigor that makes auto-merge defensible.
 
-Control the supply chain risk introduced by the review agent itself
+Control the supply chain risk introduced by the review agent itself.
 
 ## Mental Model
 
 ### Accountability
 
-The review platform owns the process. A human reviewer is skipped when the change is classified negligible and auto-merged — the evidence is what remains in the loop
+The review platform owns the process which usually sets the accountability on a devops personnale. A human reviewer is skipped when the change is classified negligible and auto-merged — the evidence is what remains in the loop
 
 ### Agentic session
 
@@ -34,8 +34,8 @@ The session is the code review agentic runs (CI step), including subagents
 
 Its subject points to the git commit under review (as the SDLC entity)  
 It holds the reference to the session logs of that review  
-It holds the review verdict and the change classification (incl. negligible / auto-merge)  
-It holds the human owner (platform). Reviewers empty as this is an autonomous agentic process.
+It holds the review verdict and change classification (incl. negligible / auto-merge)  
+It holds the human owner. Reviewers are missing as this is an autonomous agentic process.
 
 1. alignment check wrt review rubric
 2. mendatory context present in the review session
