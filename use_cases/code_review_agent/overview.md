@@ -34,7 +34,7 @@ The session is the code review agentic runs (CI step), including subagents
 
 Its subject points to the git commit under review (as the SDLC entity)  
 It holds the reference to the session logs of that review  
-It holds the review verdict and change classification (incl. negligible / auto-merge)  
+It holds the review verdict and change classification (incl. negligible / auto-merge)alignment  
 It holds the human owner. Reviewers are missing as this is an autonomous agentic process.
 
 1. alignment check wrt review rubric
