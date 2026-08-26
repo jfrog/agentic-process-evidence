@@ -143,7 +143,7 @@ Monitors an agentic process and its sessions and on completion:
 
 The below are potential implementation examples.
 
-Business goals an agentic **process** achieves. Normative field definitions stay in `[spec/](../spec/)`.
+Business goals an agentic **process** achieves. Normative field definitions stay in [spec/](../spec/).
 
 
 | Use case                                                           | Process shape                                   | Subject               |
@@ -178,7 +178,7 @@ Business goals an agentic **process** achieves. Normative field definitions stay
 
 ### Implement or validate against the spec
 
-- Treat `[spec/](./spec/)` as the normative field list and examples.  
+- Treat [spec/](./spec/) as the normative field list and examples.  
 - Prefer digest-linked references over mutable URLs alone (`sessionsLogs`, `contextArtifacts`).  
 - Keep agent identity searchable: harness + agent + language model (requested and resolved).  
 - Out of scope for this version: agent authentication methods; deep intents-analysis algorithms (only the alignment evidence envelope is specified).
@@ -201,8 +201,8 @@ Business goals an agentic **process** achieves. Normative field definitions stay
 
 | Path                       | Description                                                                               |
 | -------------------------- | ----------------------------------------------------------------------------------------- |
-| `[spec/](./spec/)`         | session log, agentic process evidence, agent identifier, alignment evidence, runtime tool |
-| `[README.md](./README.md)` | Orientation and adoption guide (this file)                                                |
+| [spec/](./spec/)         | session log, agentic process evidence, agent identifier, alignment evidence, runtime tool |
+| [README.md](./README.md) | Orientation and adoption guide (this file)                                                |
 
 
 ---
@@ -216,4 +216,4 @@ Business goals an agentic **process** achieves. Normative field definitions stay
 
 ## Status
 
-Working draft toward a shared **agentic process evidence** practice for SDLC governance. Feedback and implementations should align field names and predicate types with `[spec/](./spec/)` so evidence remains interoperable across harnesses and aggregators.
+Working draft toward a shared **agentic process evidence** practice for SDLC governance. Feedback and implementations should align field names and predicate types with [spec/](./spec/) so evidence remains interoperable across harnesses and aggregators.
