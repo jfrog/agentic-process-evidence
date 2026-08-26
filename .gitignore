@@ -1,1 +1,13 @@
+# Editor, IDE, and AI-assistant state
+.claude/
+.cursor/
+.fly/
+.idea/
+.vscode/
+
+# OS cruft
 .DS_Store
+
+# Local secrets and per-machine config
+.env
+.env*
