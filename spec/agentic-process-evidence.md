@@ -35,13 +35,13 @@ Use the session as subject when there is no SDLC entity to hang the process on, 
   "_type": "https://in-toto.io/Statement/v1",
   "subject": [
     {
-      "uri": "https://github.com/MYORG/evidence/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
+      "uri": "https://github.com/octocat/hello-world/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
       "digest": {
         "gitCommit": "bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892"
       }
     }
   ],
-  "predicateType": "https://myorg.com/evidence/<agentic-code-review|agentic-dev-process>/v1",
+  "predicateType": "https://octocat.com/evidence/<agentic-code-review|agentic-dev-process>/v1",
   "predicate": {
     "providers": [
       {
@@ -91,14 +91,14 @@ Use the session as subject when there is no SDLC entity to hang the process on, 
     ],
     "custom": {
       "baseCommit": {
-        "uri": "https://github.com/MYORG/evidence/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
+        "uri": "https://github.com/octocat/hello-world/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
         "digest": {
           "gitCommit": "bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892"
         }
       },
       "requirements": [
         {
-          "issue": "https://myorg.atlassian.net/browse/FIN-3678",
+          "issue": "https://octocat.atlassian.net/browse/FIN-3678",
           "title": "my requirements subject"
         }
       ]
@@ -146,7 +146,7 @@ A digest-linked reference to an artifact. Same idea as in-toto `ResourceDescript
 
 ```json
 {
-  "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.json",
+  "uri": "https://octocat.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.json",
   "digest": {
     "sha256": "9f2b8c1d7a4530e6b8d0c7f1a2934ee41a"
   }
@@ -185,7 +185,7 @@ A policy, guideline, instruction, or any other document the process used as inpu
 ```json
 {
   "tags": ["policy"],
-  "uri": "https://myorg.jfrog.io/artifactory/policies/intents-policy-v4.md",
+  "uri": "https://octocat.jfrog.io/artifactory/policies/intents-policy-v4.md",
   "digest": {
     "sha256": "41c0e93b6d287fa5029b8c1d64"
   }
