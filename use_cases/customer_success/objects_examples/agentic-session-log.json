@@ -1,0 +1,69 @@
+{
+  "sessionId": "c9e8d7f6-1111-2222-3333-444455556666",
+  "affectedEntities": [
+    {
+      "sessionId": "c9e8d7f6-1111-2222-3333-444455556666"
+    }
+  ],
+  "provider": {
+    "harness": {
+      "name": "support-desk",
+      "version": "4.2.0"
+    },
+    "agent": {
+      "id": "support-agent",
+      "name": "support-agent",
+      "version": "2.1.0"
+    },
+    "languageModels": [
+      {
+        "inferenceProvider": "openai/gpt-4.1",
+        "resolved": "openai/gpt-4.1-2025-04-14"
+      }
+    ]
+  },
+  "timeline": [
+    {
+      "eventId": "evt_sup_01",
+      "event": "beforeSubmitPrompt",
+      "ts": "2026-04-08T14:00:02.000Z",
+      "hook_event_name": "beforeSubmitPrompt",
+      "prompt": "Can I get a refund on order 44119? It has been 20 days.",
+      "ticket": "SUP-8821"
+    },
+    {
+      "eventId": "evt_sup_02",
+      "event": "preToolUse",
+      "ts": "2026-04-08T14:00:04.200Z",
+      "hook_event_name": "preToolUse",
+      "tool_name": "Read",
+      "tool_use_id": "toolu_sup_policy",
+      "tool_input": {
+        "path": "support-refund-policy.md"
+      }
+    },
+    {
+      "eventId": "evt_sup_03",
+      "event": "preToolUse",
+      "ts": "2026-04-08T14:00:06.800Z",
+      "hook_event_name": "preToolUse",
+      "tool_name": "OrderLookup",
+      "tool_use_id": "toolu_sup_order",
+      "tool_input": {
+        "orderId": "44119"
+      }
+    },
+    {
+      "eventId": "evt_sup_04",
+      "event": "afterAgentResponse",
+      "ts": "2026-04-08T14:00:18.000Z",
+      "hook_event_name": "afterAgentResponse",
+      "text": "Order 44119 is outside the 14-day refund window. A refund cannot be issued under current policy."
+    },
+    {
+      "eventId": "evt_sup_05",
+      "event": "sessionEnd",
+      "ts": "2026-04-08T14:00:19.000Z"
+    }
+  ]
+}

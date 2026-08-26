@@ -1,0 +1,171 @@
+# Code review agent - Implementation
+
+Two elements. Protocol needs both.
+
+1. **Agent runtime tool** — telemetry capture, aggregate on review complete, signed **agentic-code-review-evidence** push
+2. **Server** — persist (audit + troubleshooting), alignment checks, deployment gates time evaluations (policy-as-code)
+
+Runtime tool produces. Server keeps and enforces.
+
+What the **agentic-code-review-evidence** is *for*:
+
+- **Agent identity** — harness, agent, model (requested vs resolved)
+- **Provenance** — review process bound to the git commit under review
+- **Execution traceability** — points to the session timeline (diff tools, rubric, MCP) of that review
+- **Integrity & non-repudiation** — signed in-toto / DSSE, not editable after the fact
+- **Policy-as-code** — gates auto-merge negligible changes; keep regulatory rigor when the human is not in the loop
+
+---
+
+## 1. Agent runtime tool
+
+Sits next to the code review agent (CI, GitHub Actions). Active on every review run you intend to govern.
+
+### Telemetry capture
+
+As the agent inspects the diff and classifies the change, the runtime tool logs operational context into **agentic-session-log**s buffer. Harness hooks are one way to capture that timeline.
+
+The telemetry must also provide information that will allow to bind the session log to the entity space, in this case the commit under review (and the base commit of the diff).
+
+Each log carries `sessionId`, `provider` (harness / agent / models), and `parentSessionId` when it is a subagent.
+
+Example: `[objects_examples/agentic-session-log.json](./objects_examples/agentic-session-log.json)`.
+
+### Aggregating on review complete
+
+For this use case we decided that **review complete** is the process end.
+
+Typically one session. Still:
+
+- Finds every session log of this review run — including subagents
+- Stamps `affectedEntities.gitCommit` on those logs with the commit under review
+- One `traceId` for the process
+- Unions `providers` and `tools` across sessions
+- `startTimestamp` = first session start
+- `endTimestamp` = review complete
+
+Don't wait for merge. Merge is a later gate. Subject is the reviewed commit.
+
+### Evidence push
+
+Upload the session logs to persistent storage (`uri` + `sha256`).
+
+Then craft **agentic code review evidence**, sign it (in-toto + DSSE), and push to the SDLC management platform. Example: `[objects_examples/agentic-code-review-evidence.json](./objects_examples/agentic-code-review-evidence.json)`.
+
+That is the handoff. After this the logs and the signed evidence live on the server.
+
+---
+
+## 2. Server
+
+Receives the push. Keep it, check it, evaluate it at later choke points.
+
+### Persistence — audit and troubleshooting
+
+Session logs and evidence stay as long as the release is relevant, For a minimal time of least **6 months** (EU AI Act Art. 19).
+
+Store them searchable. Minimum keys:
+
+- `commit` / subject
+- `sessionId` (and `parentSessionId`)
+- `agent` / harness / models
+- `tools`
+
+Binding evidence and logs to standard SDLC entities (commit → package → release) is what makes post-release audit work — same idea as an SBOM.
+
+If a tool or MCP is later identified as malicious: search the session logs that used it, walk those logs to the commits and the software releases that shipped them.
+
+Process evidence on the commit is the index. Session logs are the drill-down.
+
+### Alignment check
+
+The server MAY emit **alignment evidence** per session log (`ALIGNED` | `MISALIGNED`). Subject = the session log.
+
+One way: run another agent over the persisted session log — prompts, thinking, tool use — against the review rubric / policies.
+
+If a session never saw the rubric or the actual diff, that is this check. The log + `contextArtifacts` are the proof.
+
+Example: `[objects_examples/agentic-session-alignment-evidence.json](./objects_examples/agentic-session-alignment-evidence.json)`.
+
+### Deployment gates (policy-as-code)
+
+The review verdict is not the last control point. Before software moves — **merge**, package publish, **promotion** — deployment gates evaluate the attached agentic code review evidence (alongside the usual scans, build provenance, tests).
+
+Typical gate: auto-merge only if the review classified the change **NEGLIGIBLE** and `result` is `APPROVED`. That is how you take the human out of the loop for the easy cases, with the evidence still there for regulators. Otherwise require a human.
+
+Look up the process evidence on the commit, then the alignment evidence on its session logs, and verify:
+
+- There is a human accountable (`owner`) — platform, or a named reviewer when auto-merge is not eligible
+- Change classification and `autoMergeEligible` match policy
+- Mandatory context was present in the review session (`contextArtifacts` + logs)
+- The agent stayed aligned with the review rubric (alignment evidence)
+- The agent did not attempt unapproved lateral operations
+- Review was generated by an approved LLM
+- The agent used approved tools / harness
+- Evidence exists and is signed
+
+Fail → block the merge (or route to a human). Pass → the commit may merge.
+
+Same evidence, later choke point. The runtime tool does not gate. The server does.
+
+---
+
+## Artifacts
+
+### agentic-session-log
+
+`[objects_examples/agentic-session-log.json](./objects_examples/agentic-session-log.json)`
+
+Captured by the runtime tool, persisted by the server. One per review session (incl. subagents).
+
+- `sessionId` — this session
+- `affectedEntities.gitCommit` — the commit under review
+- `provider` — harness, agent, models (requested vs resolved)
+- `parentSessionId` — when it is a subagent
+- `timeline[]` — timeline events such as prompts, tool use, thinking tokens, can be captured via hooks.
+
+### agentic-code-review-evidence
+
+`[objects_examples/agentic-code-review-evidence.json](./objects_examples/agentic-code-review-evidence.json)`
+
+Signed, attached to the commit under review, queried by deployment gates.
+
+- `predicateType`: `https://jfrog.com/evidence/agentic-code-review/v1`
+- `subject` = the git commit under review
+- `sessionsLogs[]` = every uploaded log, uri + digest
+- `owner` = the review platform (or the human who owns the bot)
+- `reviewers` = human reviewers when present; omit when auto-merged
+- `result` = `APPROVED` | `REJECTED`
+- `contextArtifacts` = review rubric / policies that were injected (`policy`, …)
+- `custom.requirements` = the task ticket
+- `custom.baseCommit` = the base SHA of the diff
+- `custom.changeProfile` = classification, size, `autoMergeEligible`
+- `custom.pullRequest` = the PR this review ran on
+- `intents` / `processSummary` extracted from the review session
+- `createdBy` = the runtime tool
+
+### agentic-session-alignment-evidence
+
+`[objects_examples/agentic-session-alignment-evidence.json](./objects_examples/agentic-session-alignment-evidence.json)`
+
+Optional. Produced on the server from the persisted session logs. Used by the gates. Does not replace process evidence — process evidence says what happened, this says whether it was ok.
+
+- `predicateType`: `https://jfrog.com/evidence/agentic-session-alignment/v1`
+- `subject` = the evaluated session log (uri + digest)
+- `sessionsLogs[]` omitted — the subject already identifies the log
+- `provider` = the alignment checker (harness / agent / models), not the review agent
+- `result` = `ALIGNED` | `MISALIGNED`
+- `contextArtifacts` = rubric / policies the session was checked against
+- `custom.baseCommit` = the base SHA
+- `custom.violations` = short violation list when `MISALIGNED`
+- `owner` = who ran / owns the check
+- `createdBy` = the alignment checker
+
+## See also
+
+- `[overview.md](./overview.md)`
+- `[objects_examples/](./objects_examples/)`
+- `[spec/agent-runtime-tool.md](../../spec/agent-runtime-tool.md)`
+- `[spec/agentic-session-log.md](../../spec/agentic-session-log.md)`
+- `[spec/agentic-process-evidence.md](../../spec/agentic-process-evidence.md)`
+- `[spec/alignment-evidence.md](../../spec/alignment-evidence.md)`

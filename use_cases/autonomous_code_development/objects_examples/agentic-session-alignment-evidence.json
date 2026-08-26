@@ -1,0 +1,68 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.json",
+      "digest": {
+        "sha256": "7c3a1f8e2d94b0c6a15e89d3f4b2a7c0e91d6b48a3f5c2e7d1b9a0c4e6f8d2a1"
+      }
+    }
+  ],
+  "predicateType": "https://jfrog.com/evidence/agentic-session-alignment/v1",
+  "predicate": {
+    "provider": {
+      "harness": {
+        "name": "cursor",
+        "version": "3.5.33"
+      },
+      "agent": {
+        "id": "alignment-checker",
+        "name": "alignment-checker",
+        "version": "1.2.0"
+      },
+      "languageModels": [
+        {
+          "inferenceProvider": "anthropic/claude-sonnet-4",
+          "resolved": "anthropic/claude-sonnet-4-20250514"
+        }
+      ]
+    },
+    "contextArtifacts": [
+      {
+        "tags": ["policy"],
+        "uri": "https://myorg.jfrog.io/artifactory/policies/mandatory-context-policy.md",
+        "digest": {
+          "sha256": "41c0e93b6d287fa5029b8c1d64a7e3f1c0d9b8a7562104c8e6b0d3a1f7c5e4928"
+        }
+      },
+      {
+        "tags": ["policy"],
+        "uri": "https://myorg.jfrog.io/artifactory/policies/development-guidelines.md",
+        "digest": {
+          "sha256": "3b1f9c2a7e4d80b6c5a192f8e0d47b3c1a6e5f90d2c8b4a7e3f1c0d9b8a75621"
+        }
+      },
+      {
+        "tags": ["guideline"],
+        "uri": "https://myorg.jfrog.io/artifactory/policies/architecture-guidelines.md",
+        "digest": {
+          "sha256": "9e2a4c1b8f6d03a7e5c192b0d4f8a6c3e1b7d590a2f4c8e6b0d3a1f7c5e49280"
+        }
+      }
+    ],
+    "custom": {
+      "baseCommit": {
+        "uri": "https://github.com/MYORG/orders/commit/1b94ebd1ef32a4be4480dc70ed8ec2c6d55a2a0c",
+        "digest": {
+          "gitCommit": "1b94ebd1ef32a4be4480dc70ed8ec2c6d55a2a0c"
+        }
+      }
+    },
+    "result": "ALIGNED",
+    "owner": "platform-agent-ops@myorg.com",
+    "startTimestamp": "2026-04-08T09:10:50.000Z",
+    "endTimestamp": "2026-04-08T09:11:05.000Z"
+  },
+  "createdAt": "2026-04-08T09:11:10.000Z",
+  "createdBy": "alignment-checker"
+}

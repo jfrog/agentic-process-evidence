@@ -1,0 +1,87 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "uri": "https://github.com/MYORG/orders/commit/bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892",
+      "digest": {
+        "gitCommit": "bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892"
+      }
+    }
+  ],
+  "predicateType": "https://jfrog.com/evidence/agentic-code-review/v1",
+  "predicate": {
+    "providers": [
+      {
+        "harness": {
+          "name": "github-actions",
+          "version": "2.322.0"
+        },
+        "agent": {
+          "id": "code-review-agent",
+          "name": "code-review-agent",
+          "version": "0.9.0"
+        },
+        "languageModels": [
+          {
+            "inferenceProvider": "anthropic/claude-sonnet-4",
+            "resolved": "anthropic/claude-sonnet-4-20250514"
+          }
+        ]
+      }
+    ],
+    "traceId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+    "sessionsLogs": [
+      {
+        "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/b2c3d4e5-f6a7-8901-bcde-f12345678901.json",
+        "digest": {
+          "sha256": "1a9c4e2b7d80f3a6c5e192d8b0a47c3e1f6d5b90c2a8e4b7d3f1c0a9e8b75630"
+        }
+      }
+    ],
+    "tools": [
+      { "name": "Read", "version": "review-agent" },
+      { "name": "GitDiff", "version": "review-agent" }
+    ],
+    "contextArtifacts": [
+      {
+        "tags": ["policy"],
+        "uri": "https://myorg.jfrog.io/artifactory/policies/org-review-rubric.md",
+        "digest": {
+          "sha256": "6d2e8a1c4f90b3d7e5a192c0f8b46a3d1c7e5f80b2d4a8c6e0f3b1d9a8c54721"
+        }
+      }
+    ],
+    "custom": {
+      "baseCommit": {
+        "uri": "https://github.com/MYORG/orders/commit/1b94ebd1ef32a4be4480dc70ed8ec2c6d55a2a0c",
+        "digest": {
+          "gitCommit": "1b94ebd1ef32a4be4480dc70ed8ec2c6d55a2a0c"
+        }
+      },
+      "requirements": [
+        {
+          "issue": "https://myorg.atlassian.net/browse/FIN-3678",
+          "title": "Rate limit POST /api/orders"
+        }
+      ],
+      "changeProfile": {
+        "classification": "NEGLIGIBLE",
+        "filesChanged": 1,
+        "linesAdded": 1,
+        "linesRemoved": 1,
+        "autoMergeEligible": true
+      },
+      "pullRequest": "https://github.com/MYORG/orders/pull/412"
+    },
+    "result": "APPROVED",
+    "intents": [
+      "Code review agent classification of commit bf02510"
+    ],
+    "processSummary": "Code review agent inspected diff 1b94ebd1..bf02510, classified change as NEGLIGIBLE (documentation typo), and approved for auto-merge. No human reviewer.",
+    "owner": "platform-agent-ops@myorg.com",
+    "startTimestamp": "2026-04-08T09:10:00.000Z",
+    "endTimestamp": "2026-04-08T09:12:41.000Z"
+  },
+  "createdAt": "2026-04-08T09:13:05.000Z",
+  "createdBy": "agent-runtime-tool"
+}

@@ -1,0 +1,50 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/c9e8d7f6-1111-2222-3333-444455556666.json",
+      "digest": {
+        "sha256": "8b4d1e7a2c90f5d3e6a182b9c0d47e3f1a6c5b80d2e8a4c7f3b1d0e9a8c64712"
+      }
+    }
+  ],
+  "predicateType": "https://jfrog.com/evidence/agentic-session-alignment/v1",
+  "predicate": {
+    "provider": {
+      "harness": {
+        "name": "support-desk",
+        "version": "4.2.0"
+      },
+      "agent": {
+        "id": "alignment-checker",
+        "name": "alignment-checker",
+        "version": "1.2.0"
+      },
+      "languageModels": [
+        {
+          "inferenceProvider": "anthropic/claude-sonnet-4",
+          "resolved": "anthropic/claude-sonnet-4-20250514"
+        }
+      ]
+    },
+    "contextArtifacts": [
+      {
+        "tags": ["policy"],
+        "uri": "https://myorg.jfrog.io/artifactory/policies/support-refund-policy.md",
+        "digest": {
+          "sha256": "2f7c1a9e4b80d3c6e5a192f0d8b46c3a1e7d5f90b2c4a8e6d0f3b1c9a8e54730"
+        }
+      }
+    ],
+    "custom": {
+      "ticket": "SUP-8821",
+      "orderId": "44119"
+    },
+    "result": "ALIGNED",
+    "owner": "support-platform@myorg.com",
+    "startTimestamp": "2026-04-08T14:00:26.000Z",
+    "endTimestamp": "2026-04-08T14:00:34.000Z"
+  },
+  "createdAt": "2026-04-08T14:00:36.000Z",
+  "createdBy": "alignment-checker"
+}
