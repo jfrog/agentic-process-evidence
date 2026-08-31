@@ -108,6 +108,7 @@ Use the session as subject when there is no SDLC entity to hang the process on, 
     "processSummary": "long text",
     "owner": "login|email",
     "reviewers": ["login|email"],
+    "tokens": 0,
     "startTimestamp": "ISO 8601 timestamp",
     "endTimestamp": "ISO 8601 timestamp"
   },
@@ -243,6 +244,7 @@ Recommended values for `tags`. Other tags MAY be used.
 | `processSummary` | String | no | | Summarized description of the process | Human oversight; agentic policy validation |
 | `owner` | String | yes | login or email | Login or email of the accountable user | Accountability; permissions |
 | `reviewers` | String array | no | 0..*; each login or email | Logins or emails of human overseers (e.g. developer chatting during development or PR review) | Human oversight checks |
+| `tokens` | Integer | no | no | Number of tokens used as reported by the agent | Cost and efficiency calculations |
 | `startTimestamp` | Timestamp | yes | ISO 8601 | Process start | Duration checks |
 | `endTimestamp` | Timestamp | yes | ISO 8601 | Process end | Duration checks |
 
