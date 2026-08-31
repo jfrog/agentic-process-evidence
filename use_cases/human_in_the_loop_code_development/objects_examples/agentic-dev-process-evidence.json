@@ -79,6 +79,7 @@
     "processSummary": "One IDE session on feature branch fin-3678-rate-limit produced commit bf02510. Developer and Cursor agent implemented rate limiting and committed for pre-merge review.",
     "owner": "ada@myorg.com",
     "reviewers": ["ada@myorg.com"],
+    "tokens": 100,
     "startTimestamp": "2026-04-08T08:51:02.114Z",
     "endTimestamp": "2026-04-08T09:10:44.000Z"
   },

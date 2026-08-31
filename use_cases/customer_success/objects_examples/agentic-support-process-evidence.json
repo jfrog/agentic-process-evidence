@@ -53,6 +53,7 @@
     ],
     "processSummary": "Autonomous support agent looked up order 44119, applied the 14-day refund policy, and denied the refund. Single session; no SDLC subject.",
     "owner": "support-platform@myorg.com",
+    "tokens": 100,
     "startTimestamp": "2026-04-08T14:00:02.000Z",
     "endTimestamp": "2026-04-08T14:00:19.000Z"
   },

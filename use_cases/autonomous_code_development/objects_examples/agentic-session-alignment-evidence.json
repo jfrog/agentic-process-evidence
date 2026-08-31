@@ -60,6 +60,7 @@
     },
     "result": "ALIGNED",
     "owner": "platform-agent-ops@myorg.com",
+    "tokens": 100,
     "startTimestamp": "2026-04-08T09:10:50.000Z",
     "endTimestamp": "2026-04-08T09:11:05.000Z"
   },
