@@ -1,0 +1,82 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "uri": "https://github.com/MYORG/orders/commit/9c41d7e2b85f03a6c1e4d8b70f2a95c3e6d17b48",
+      "digest": {
+        "gitCommit": "9c41d7e2b85f03a6c1e4d8b70f2a95c3e6d17b48"
+      }
+    }
+  ],
+  "predicateType": "https://jfrog.com/evidence/agentic-dev-process/v1",
+  "predicate": {
+    "providers": [
+      {
+        "harness": {
+          "name": "cursor",
+          "version": "3.5.33"
+        }
+      },
+      {
+        "harness": {
+          "name": "agent-console",
+          "version": "0.79.0"
+        }
+      }
+    ],
+    "traceId": "release/orders-2.14.0",
+    "sessionsLogs": [
+      {
+        "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.json",
+        "digest": {
+          "sha256": "7c3a1f8e2d94b0c6a15e89d3f4b2a7c0e91d6b48a3f5c2e7d1b9a0c4e6f8d2a1"
+        }
+      },
+      {
+        "uri": "https://cyl-castillo.github.io/testigo/examples/fixy-deploy-verification.proofpack.json",
+        "digest": {
+          "sha256": "2c9d7f01ea070530b6bb25084d3e274a197c3e4d14508cb69281ab732145b23b"
+        }
+      }
+    ],
+    "tools": [
+      { "name": "Read", "version": "cursor-native" },
+      { "name": "Write", "version": "cursor-native" },
+      { "name": "Bash" }
+    ],
+    "custom": {
+      "testigo": {
+        "sessionsLogs": [
+          {
+            "digest": {
+              "sha256": "2c9d7f01ea070530b6bb25084d3e274a197c3e4d14508cb69281ab732145b23b"
+            },
+            "packetFormat": "testigo-proofpack/v0.1",
+            "predicateType": "https://github.com/cyl-castillo/testigo/attestation/v0.1",
+            "signerKeyId": "8caf09075df11abbbdea5cd1d120a5654d8d1ce2a32e2a6f018dde557c5014da",
+            "segmentDigest": "af21a0b7bfe48022764831415f1c82f45211f0b886ad59bbe4a19842308e0ceb",
+            "redactedEntries": 7,
+            "humanApprovalDecisions": 3,
+            "turnDiff": {
+              "filesChanged": []
+            }
+          }
+        ]
+      }
+    },
+    "result": "COMPLETED",
+    "intents": [
+      "Implement token-bucket rate limiting on POST /api/orders",
+      "Verify the production deploy of the change (read-only)"
+    ],
+    "processSummary": "Two sessions contributed to commit 9c41d7e. The coding session is a plain timeline (first sessionsLogs entry). The post-deploy verification session is a Testigo packet (second entry): DSSE ed25519 signed by key 8caf0907…, 3 human approval decisions, empty turn diff, 7 of 12 entries redacted with linkage intact.",
+    "owner": "ada@myorg.com",
+    "reviewers": [
+      "ada@myorg.com"
+    ],
+    "startTimestamp": "2026-07-15T14:51:02.114Z",
+    "endTimestamp": "2026-07-15T16:42:15.987Z"
+  },
+  "createdAt": "2026-07-15T16:43:02.000Z",
+  "createdBy": "agent-runtime-tool (illustrative; unsigned)"
+}

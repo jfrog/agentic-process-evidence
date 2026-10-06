@@ -154,6 +154,15 @@ Business goals an agentic **process** achieves. Normative field definitions stay
 | [Customer success agent](./use_cases/customer_success/overview.md) | Autonomous agent; process = one session         | session log           |
 
 
+## Integrations
+
+How existing tools produce or consume the entities of this standard.
+
+| Integration | What it provides | How it plugs in |
+| ----------- | ---------------- | --------------- |
+| [Testigo](./integrations/testigo/README.md) | Signed session logs: a hash-chained, DSSE-signed, selectively disclosable session log with per-action human approval decisions | A packet is a `sessionsLogs[]` entry, or the subject when the process is one session |
+
+
 ---
 
 ## How to use this standard
@@ -203,6 +212,7 @@ Business goals an agentic **process** achieves. Normative field definitions stay
 | -------------------------- | ----------------------------------------------------------------------------------------- |
 | [spec/](./spec/)         | session log, agentic process evidence, agent identifier, alignment evidence, runtime tool |
 | [README.md](./README.md) | Orientation and adoption guide (this file)                                                |
+| [integrations/](./integrations/) | How existing tools produce or consume these entities (mapping, examples, verification) |
 
 
 ---

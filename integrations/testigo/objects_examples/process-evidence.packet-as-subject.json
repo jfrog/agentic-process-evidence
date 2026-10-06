@@ -1,0 +1,66 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "uri": "https://cyl-castillo.github.io/testigo/examples/fixy-deploy-verification.proofpack.json",
+      "digest": {
+        "sha256": "2c9d7f01ea070530b6bb25084d3e274a197c3e4d14508cb69281ab732145b23b"
+      }
+    }
+  ],
+  "predicateType": "https://jfrog.com/evidence/agentic-dev-process/v1",
+  "predicate": {
+    "providers": [
+      {
+        "harness": {
+          "name": "agent-console",
+          "version": "0.79.0"
+        }
+      }
+    ],
+    "traceId": "term:t-1784133648667-a5uwfj",
+    "tools": [
+      {
+        "name": "Bash"
+      }
+    ],
+    "custom": {
+      "baseCommit": {
+        "digest": {
+          "gitCommit": "d272287a68d73479ade0678b769180ffcdcc5e6c"
+        }
+      },
+      "testigo": {
+        "packetFormat": "testigo-proofpack/v0.1",
+        "predicateType": "https://github.com/cyl-castillo/testigo/attestation/v0.1",
+        "signerKeyId": "8caf09075df11abbbdea5cd1d120a5654d8d1ce2a32e2a6f018dde557c5014da",
+        "segmentDigest": "af21a0b7bfe48022764831415f1c82f45211f0b886ad59bbe4a19842308e0ceb",
+        "ledgerHead": {
+          "hash": "4e18791074a729f1f1c2fe42372f76621c84f4fad4eb96efcec676619089fa6f",
+          "seq": 11
+        },
+        "redactedEntries": 7,
+        "stubs": 0,
+        "humanApprovalDecisions": 3,
+        "turnDiff": {
+          "preSha": "d272287a68d73479ade0678b769180ffcdcc5e6c",
+          "postSha": "5523ec505a18417baba8439c69db7393d3e90d72",
+          "filesChanged": []
+        }
+      }
+    },
+    "result": "COMPLETED",
+    "intents": [
+      "Verify the state of the Fixy production deploy (read-only)"
+    ],
+    "processSummary": "12 witnessed events in case term:t-1784133648667-a5uwfj: 3 human approval decision(s) (allow), 7 redacted entries with chain linkage intact, turn diff 0 file(s). The packet referenced as subject is DSSE ed25519 signed by key 8caf0907…; verify it at https://cyl-castillo.github.io/testigo/verifier/testigo-verifier.html.",
+    "owner": "cyl-castillo",
+    "reviewers": [
+      "cyl-castillo"
+    ],
+    "startTimestamp": "2026-07-15T16:41:19.508Z",
+    "endTimestamp": "2026-07-15T16:42:15.987Z"
+  },
+  "createdAt": "2026-09-16T13:23:53.895Z",
+  "createdBy": "testigo examples/ape/build.mjs (derived from the packet; unsigned)"
+}
