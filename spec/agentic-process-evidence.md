@@ -160,6 +160,24 @@ A digest-linked reference to an artifact. Same idea as in-toto `ResourceDescript
 
 See usage examples in `subject[]` (ResourceDescriptor array), `sessionsLogs[]` (ResourceDescriptor array) and in `custom.baseCommit`.
 
+### Media type of a session log
+
+A `sessionsLogs[]` entry MAY carry `mediaType`, the in-toto `ResourceDescriptor` field, naming the media type of the bytes at `uri`. It tells a consumer, before fetching, whether the session log is a plain timeline or a signed statement it can verify, for example a DSSE-enveloped in-toto attestation (`application/vnd.in-toto.<predicate>+dsse`, per the in-toto [storage convention](https://github.com/in-toto/attestation/blob/main/spec/v1/envelope.md#storage-convention)).
+
+```json
+{
+  "uri": "https://octocat.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.dsse.json",
+  "digest": {
+    "sha256": "9f2b8c1d7a4530e6b8d0c7f1a2934ee41a"
+  },
+  "mediaType": "application/vnd.in-toto.session-chain+dsse"
+}
+```
+
+- `digest` is computed over the bytes at `uri`, whatever the media type. Every consumer MUST match it.
+- Consumers that recognise the media type MAY also verify the statement (signature and contents) in addition to the digest. `mediaType` is a hint, not an authenticated claim: what the statement attests is read from the verified payload, never from `mediaType`.
+- Consumers that do not recognise the media type MUST ignore it. Entries without `mediaType` are unchanged.
+
 ## Tool
 
 A tool used during the agentic process (IDE action, MCP server, CLI, etc.).
@@ -234,7 +252,7 @@ Recommended values for `tags`. Other tags MAY be used.
 |---|---|---|---|---|---|
 | `providers` | Provider array | yes | ≥1; see [Provider](./agent-identifier.md) | Agentic provider stacks used in the process | Verify approved / whitelisted harness |
 | `traceId` | String | no | non-empty when present | Unique identifier of the agentic process | Correlate sessions to the process; identify runner |
-| `sessionsLogs` | ResourceDescriptor array | no | 0..*; see [Resource descriptor](#resource-descriptor); each `digest` SHOULD include `sha256`; omit when the subject is the session log itself | Links to session logs (full agentic chat context) | Download logs for review |
+| `sessionsLogs` | ResourceDescriptor array | no | 0..*; see [Resource descriptor](#resource-descriptor); each `digest` SHOULD include `sha256`; entries MAY carry `mediaType`, see [Media type of a session log](#media-type-of-a-session-log); omit when the subject is the session log itself | Links to session logs (full agentic chat context) | Download logs for review |
 | `tools` | Tool array | no | 0..*; see [Tool](#tool) | Used tools | Check for blacklisted tools |
 | `contextArtifacts` | ContextArtifact array | no | 0..*; see [Context artifact](#context-artifact) | Artifacts used by the process (policies, instructions, prior logs, guidelines, …) | Input provenance |
 | `custom` | Object | no | process-specific keys | Custom information for the specific agentic process | Process-specific checks |
