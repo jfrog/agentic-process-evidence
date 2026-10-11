@@ -73,7 +73,7 @@ The model has two building blocks and a set of process-specific implementations:
 
 - **Session log artifacts (BOM)** - the raw agent timeline of each session, persisted in a searchable & durable storage.
 - **Agentic session evidence** - one generic, in-toto based provenance model that carries the provider stack, session identifiers, session log references, tools, context artifacts, result, owner and reviewers.
-- **Implementations** - each agentic process specializes the generic evidence with its own `predicateType`, subject and process-specific fields: `agentic-code-development`, `agentic-pr-review` and `agentic-alignment-check`.
+- **Implementations** - the agentic process uses `predicateType` of `agentic-process`, with process dependent subject, processType: `code-development`, `pr-review`, `session-alignment`, and process-specific fields such as baseCommit, requirements, etc.
 
 Every implementation references the session logs it produced (`sessionsLogs[].uri` + `digest`) and is attached to an SDLC subject, a git commit, an artifact digest, an application version, or the session log artifact itself in the case of an alignment check.
 
@@ -108,7 +108,7 @@ The agentic process evidence should only be created once the agentic process com
 | Attribute         | Guidance                                                                                                                                                                                   |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Schema**        | [Agentic process evidence](spec/agentic-process-evidence.md)                                                                                                                               |
-| **predicateType** | e.g. `https://jfrog.com/evidence/agentic-code-review`, `https://jfrog.com/evidence/agentic-dev-process`                                                                                    |
+| **predicateType** | e.g. `https://jfrog.com/evidence/agentic-process`                                                                                    |
 | **Contains**      | Provider (harness / agent / LLMs), process id (`traceId`), session logs, tools, context artifacts, result, intents, summary, owner, reviewers, timestamps and process-specific custom data |
 | **Used for**      | Provenance on the agentic process allowing for Policy checks and auditing                                                                                                                  |
 | **Retention**     | Aligned to release retention                                                                                                                                                               |

@@ -8,8 +8,9 @@
       }
     }
   ],
-  "predicateType": "https://jfrog.com/evidence/agentic-support-process/v1",
+  "predicateType": "https://jfrog.com/evidence/agentic-process/v0.1",
   "predicate": {
+    "processType": "support-process",
     "providers": [
       {
         "harness": {

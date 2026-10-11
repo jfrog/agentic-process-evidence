@@ -35,14 +35,15 @@ Use the session as subject when there is no SDLC entity to hang the process on, 
   "_type": "https://in-toto.io/Statement/v1",
   "subject": [
     {
-      "uri": "https://github.com/octocat/hello-world/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
+      "uri": "https://jfrog.com/myOrg/hello-world/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
       "digest": {
         "gitCommit": "bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892"
       }
     }
   ],
-  "predicateType": "https://octocat.com/evidence/<agentic-code-review|agentic-dev-process>/v1",
+  "predicateType": "https://jfrog.com/evidence/agentic-process/v0.1",
   "predicate": {
+    "processType": "code-development",
     "providers": [
       {
         "harness": {
@@ -91,14 +92,14 @@ Use the session as subject when there is no SDLC entity to hang the process on, 
     ],
     "custom": {
       "baseCommit": {
-        "uri": "https://github.com/octocat/hello-world/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
+        "uri": "https://github.com/myorg/hello-world/commit/bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892",
         "digest": {
           "gitCommit": "bf02510c8ce0b804a099797510af...c19325acfb979538c5b521304c83cde63892"
         }
       },
       "requirements": [
         {
-          "issue": "https://octocat.atlassian.net/browse/FIN-3678",
+          "issue": "https://myorg.atlassian.net/browse/FIN-3678",
           "title": "my requirements subject"
         }
       ]
@@ -146,7 +147,7 @@ A digest-linked reference to an artifact. Same idea as in-toto `ResourceDescript
 
 ```json
 {
-  "uri": "https://octocat.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.json",
+  "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.json",
   "digest": {
     "sha256": "9f2b8c1d7a4530e6b8d0c7f1a2934ee41a"
   }
@@ -166,7 +167,7 @@ A `sessionsLogs[]` entry MAY carry `mediaType`, the in-toto `ResourceDescriptor`
 
 ```json
 {
-  "uri": "https://octocat.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.dsse.json",
+  "uri": "https://myorg.jfrog.io/artifactory/agentic-session-logs/a1b2c3d4-e5f6-7890-abcd-ef1234567890.dsse.json",
   "digest": {
     "sha256": "9f2b8c1d7a4530e6b8d0c7f1a2934ee41a"
   },
@@ -203,7 +204,7 @@ A policy, guideline, instruction, or any other document the process used as inpu
 ```json
 {
   "tags": ["policy"],
-  "uri": "https://octocat.jfrog.io/artifactory/policies/intents-policy-v4.md",
+  "uri": "https://myorg.jfrog.io/artifactory/policies/intents-policy-v4.md",
   "digest": {
     "sha256": "41c0e93b6d287fa5029b8c1d64"
   }
@@ -250,6 +251,7 @@ Recommended values for `tags`. Other tags MAY be used.
 
 | Field | Type | Required | Constraints | Description | Usages |
 |---|---|---|---|---|---|
+| `processType` | Process type | yes | non-empty | type of the process (e.g. code-development, pr-approval, promotion) | Check process type |
 | `providers` | Provider array | yes | ≥1; see [Provider](./agent-identifier.md) | Agentic provider stacks used in the process | Verify approved / whitelisted harness |
 | `traceId` | String | no | non-empty when present | Unique identifier of the agentic process | Correlate sessions to the process; identify runner |
 | `sessionsLogs` | ResourceDescriptor array | no | 0..*; see [Resource descriptor](#resource-descriptor); each `digest` SHOULD include `sha256`; entries MAY carry `mediaType`, see [Media type of a session log](#media-type-of-a-session-log); omit when the subject is the session log itself | Links to session logs (full agentic chat context) | Download logs for review |

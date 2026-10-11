@@ -8,8 +8,9 @@
       }
     }
   ],
-  "predicateType": "https://jfrog.com/evidence/agentic-dev-process/v1",
+  "predicateType": "https://jfrog.com/evidence/agentic-process/v0.1",
   "predicate": {
+    "processType": "code-development",
     "providers": [
       {
         "harness": {
