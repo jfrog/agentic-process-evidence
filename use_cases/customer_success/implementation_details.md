@@ -123,14 +123,15 @@ Captured by the runtime tool, persisted by the server. One per support session.
 - `parentSessionId` — when it is a subagent
 - `timeline[]` — timeline events such as prompts, tool use, thinking tokens, can be captured via hooks.
 
-### agentic-support-process-evidence
+### agentic support process evidence
 
 `[objects_examples/agentic-support-process-evidence.json](./objects_examples/agentic-support-process-evidence.json)`
 
 Signed, attached to the session log, queried by policy gates.
 
-- `predicateType`: `https://jfrog.com/evidence/agentic-support-process/v1`
+- `predicateType`: `https://jfrog.com/evidence/agentic-process/v0.1`
 - `subject` = this session log (uri + digest)
+- `processType` = `support-process`
 - `sessionsLogs[]` omitted — the subject already identifies the log
 - `owner` = the support platform (or the human the case was routed to)
 - `result` = `COMPLETED` when the case is resolved
@@ -139,14 +140,15 @@ Signed, attached to the session log, queried by policy gates.
 - `intents` / `processSummary` extracted from the session
 - `createdBy` = the runtime tool
 
-### agentic-session-alignment-evidence
+### agentic session alignment evidence
 
 `[objects_examples/agentic-session-alignment-evidence.json](./objects_examples/agentic-session-alignment-evidence.json)`
 
 Optional. Produced on the server from the persisted session log. Used by the gates. Does not replace process evidence — process evidence says what happened, this says whether it was ok.
 
-- `predicateType`: `https://jfrog.com/evidence/agentic-session-alignment/v1`
+- `predicateType`: `https://jfrog.com/evidence/agentic-process/v0.1`
 - `subject` = the evaluated session log (uri + digest)
+- `processType` = `session-alignment`
 - `sessionsLogs[]` omitted — the subject already identifies the log
 - `provider` = the alignment checker (harness / agent / models), not the support agent
 - `result` = `ALIGNED` | `MISALIGNED`

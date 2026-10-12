@@ -45,8 +45,8 @@ It holds the human owner. Reviewers are missing as this is an autonomous agentic
 ## Artifacts
 
 - **agentic-session-log** — one per review session (incl. subagents)
-- **agentic-code-review-evidence** — on the git commit under review
-- **agentic-session-alignment-evidence** — optional, per session log; produced on the server
+- **agentic code review evidence** — on the git commit under review
+- **agentic session alignment evidence** — optional, per session log; produced on the server
 
 ## See also
 

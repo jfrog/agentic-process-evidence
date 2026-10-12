@@ -2,12 +2,12 @@
 
 Two elements. Protocol needs both.
 
-1. **Agent runtime tool** — telemetry capture, aggregate on review complete, signed **agentic-code-review-evidence** push
+1. **Agent runtime tool** — telemetry capture, aggregate on review complete, signed **agentic code review evidence** push
 2. **Server** — persist (audit + troubleshooting), alignment checks, deployment gates time evaluations (policy-as-code)
 
 Runtime tool produces. Server keeps and enforces.
 
-What the **agentic-code-review-evidence** is *for*:
+What the **agentic code review evidence** is *for*:
 
 - **Agent identity** — harness, agent, model (requested vs resolved)
 - **Provenance** — review process bound to the git commit under review
@@ -124,13 +124,14 @@ Captured by the runtime tool, persisted by the server. One per review session (i
 - `parentSessionId` — when it is a subagent
 - `timeline[]` — timeline events such as prompts, tool use, thinking tokens, can be captured via hooks.
 
-### agentic-code-review-evidence
+### agentic code review evidence
 
 `[objects_examples/agentic-code-review-evidence.json](./objects_examples/agentic-code-review-evidence.json)`
 
 Signed, attached to the commit under review, queried by deployment gates.
 
-- `predicateType`: `https://jfrog.com/evidence/agentic-code-review/v1`
+- `predicateType`: `https://jfrog.com/evidence/agentic-process/v0.1`
+- `processType`: `code-review`
 - `subject` = the git commit under review
 - `sessionsLogs[]` = every uploaded log, uri + digest
 - `owner` = the review platform (or the human who owns the bot)
@@ -144,13 +145,14 @@ Signed, attached to the commit under review, queried by deployment gates.
 - `intents` / `processSummary` extracted from the review session
 - `createdBy` = the runtime tool
 
-### agentic-session-alignment-evidence
+### agentic session alignment evidence
 
 `[objects_examples/agentic-session-alignment-evidence.json](./objects_examples/agentic-session-alignment-evidence.json)`
 
 Optional. Produced on the server from the persisted session logs. Used by the gates. Does not replace process evidence — process evidence says what happened, this says whether it was ok.
 
-- `predicateType`: `https://jfrog.com/evidence/agentic-session-alignment/v1`
+- `predicateType`: `https://jfrog.com/evidence/agentic-process/v0.1`
+- `processType`: `session-alignment`
 - `subject` = the evaluated session log (uri + digest)
 - `sessionsLogs[]` omitted — the subject already identifies the log
 - `provider` = the alignment checker (harness / agent / models), not the review agent

@@ -8,8 +8,9 @@
       }
     }
   ],
-  "predicateType": "https://jfrog.com/evidence/agentic-session-alignment/v1",
+  "predicateType": "https://jfrog.com/evidence/agentic-process/v0.1",
   "predicate": {
+    "processType": "session-alignment",
     "provider": {
       "harness": {
         "name": "support-desk",

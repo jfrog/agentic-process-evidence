@@ -124,14 +124,15 @@ Captured by the runtime hook, persisted by the server. One per agentic session (
 - `parentSessionId` — when it is a subagent
 - `timeline[]` — timeline events such as prompts, tool use, thinking tokens, can be captured via hooks.
 
-### agentic-dev-process-evidence
+### agentic dev process evidence
 
 `[objects_examples/agentic-dev-process-evidence.json](./objects_examples/agentic-dev-process-evidence.json)`
 
 Signed, attached to the commit, queried by deployment gates.
 
-- `predicateType`: `https://jfrog.com/evidence/agentic-dev-process/v1`
+- `predicateType`: `https://jfrog.com/evidence/agentic-process/v0.1`
 - `subject` = this git commit
+- `processType` = `code-development`
 - `sessionsLogs[]` = every uploaded log, uri + digest
 - `owner` and `reviewers` = the human developer (same person)
 - `result` = `COMPLETED` when the commit is ready for pre-merge review
@@ -141,14 +142,15 @@ Signed, attached to the commit, queried by deployment gates.
 - `intents` / `processSummary` extracted from the sessions
 - `createdBy` = the runtime tool
 
-### agentic-session-alignment-evidence
+### agentic session alignment evidence
 
 `[objects_examples/agentic-session-alignment-evidence.json](./objects_examples/agentic-session-alignment-evidence.json)`
 
 Optional. Produced on the server from the persisted session logs. Used by the gates. Does not replace process evidence — process evidence says what happened, this says whether it was ok.
 
-- `predicateType`: `https://jfrog.com/evidence/agentic-session-alignment/v1`
+- `predicateType`: `https://jfrog.com/evidence/agentic-process/v0.1`
 - `subject` = the evaluated session log (uri + digest)
+- `processType` = `session-alignment`
 - `sessionsLogs[]` omitted — the subject already identifies the log
 - `provider` = the alignment checker (harness / agent / models), not the coding agent
 - `result` = `ALIGNED` | `MISALIGNED`
