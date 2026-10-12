@@ -42,6 +42,7 @@
     },
     "result": "ALIGNED",
     "owner": "support-platform@myorg.com",
+    "tokens": 100,
     "startTimestamp": "2026-04-08T14:00:26.000Z",
     "endTimestamp": "2026-04-08T14:00:34.000Z"
   },

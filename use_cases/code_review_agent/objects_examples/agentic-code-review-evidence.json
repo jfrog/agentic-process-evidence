@@ -79,6 +79,7 @@
     ],
     "processSummary": "Code review agent inspected diff 1b94ebd1..bf02510, classified change as NEGLIGIBLE (documentation typo), and approved for auto-merge. No human reviewer.",
     "owner": "platform-agent-ops@myorg.com",
+    "tokens": 100,
     "startTimestamp": "2026-04-08T09:10:00.000Z",
     "endTimestamp": "2026-04-08T09:12:41.000Z"
   },

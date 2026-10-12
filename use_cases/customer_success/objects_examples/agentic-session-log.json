@@ -5,6 +5,7 @@
       "sessionId": "c9e8d7f6-1111-2222-3333-444455556666"
     }
   ],
+  "tokens": 100,
   "provider": {
     "harness": {
       "name": "support-desk",

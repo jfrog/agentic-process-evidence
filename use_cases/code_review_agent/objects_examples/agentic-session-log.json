@@ -5,6 +5,7 @@
       "gitCommit": "bf02510c8ce0b804a099797510afc19325acfb979538c5b521304c83cde63892"
     }
   ],
+  "tokens": 100,
   "provider": {
     "harness": {
       "name": "github-actions",
