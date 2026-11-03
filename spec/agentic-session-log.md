@@ -32,6 +32,7 @@ Session artifacts are referenced through **uri + digest** from evidence statemen
   "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "parentSessionId": "4o7g54cd-8957-7503-45ga-495867457986",
   "affectedEntities": [{"gitCommit": "bf02510c8ce0b804a099797510af"}],
+  "tokens": 100,
   "provider": {
     "harness": {
       "name": "cursor",
@@ -120,6 +121,7 @@ Notes:
 | `sessionId` | String | yes | non-empty | Session identifier | Search; correlate to a session log referenced from process evidence `sessionsLogs` |
 | `parentSessionId` | String | no | non-empty when present | Parent session / run id | Locate related sessions |
 | `affectedEntities` | Object Array | no | subject keys (e.g. `gitCommit`) | entities produced or handled | Locate logs by commit / version |
+| `tokens` | Integer | no | no | Number of tokens used as reported by the agent | Cost and efficiency calculations |
 | `provider` | Provider | yes | see [Provider](./agent-identifier.md) | Harness, agent, and language models for this log | Search; allowlist checks |
 | `timeline` | TimelineEvent array | yes | ≥1; see [Timeline event](#timeline-event) | Ordered hook events | Human review of the session |
 
