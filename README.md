@@ -7,6 +7,10 @@ This repository defines how to bind agent session information to SDLC entities (
 
 Entity definitions live under [spec/](./spec/).
 
+![Agentic Process Evidence across an SDLC](docs/diagrams/sdlc-with-ape.gif)
+
+*One pass of agentic work through an SDLC: commits, session logs, provenance, policy checks, and the release gate.*
+
 ## Why this exists
 
 Agentic tools (IDE agents, review bots, release assistants) change code and influence releases, but their provenance is often invisible to governance, auditors, and policy engines. 
@@ -211,6 +215,7 @@ How existing tools produce or consume the entities of this standard.
 | Path                       | Description                                                                               |
 | -------------------------- | ----------------------------------------------------------------------------------------- |
 | [spec/](./spec/)         | session log, agentic process evidence, agent identifier, alignment evidence, runtime tool |
+| [docs/diagrams/sdlc-with-ape.gif](./docs/diagrams/sdlc-with-ape.gif) | Animated SDLC walkthrough shown at the top of this page |
 | [README.md](./README.md) | Orientation and adoption guide (this file)                                                |
 | [integrations/](./integrations/) | How existing tools produce or consume these entities (mapping, examples, verification) |
 
