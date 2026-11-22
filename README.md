@@ -9,7 +9,7 @@ Entity definitions live under [spec/](./spec/).
 
 ![Agentic Process Evidence across an SDLC](docs/diagrams/sdlc-with-ape.gif)
 
-*One pass of agentic work through an SDLC: commits, session logs, provenance, policy checks, and the release gate.*
+*One pass of agentic work through an SDLC: commits, session logs, provenance, policy checks, and the release gate. Source: [sdlc-with-ape.html](docs/diagrams/sdlc-with-ape.html).*
 
 ## Why this exists
 
@@ -222,6 +222,7 @@ How existing tools produce or consume the entities of this standard.
 | -------------------------- | ----------------------------------------------------------------------------------------- |
 | [spec/](./spec/)         | session log, agentic process evidence, agent identifier, alignment evidence, runtime tool |
 | [docs/diagrams/sdlc-with-ape.gif](./docs/diagrams/sdlc-with-ape.gif) | Animated SDLC walkthrough shown at the top of this page |
+| [docs/diagrams/sdlc-with-ape.html](./docs/diagrams/sdlc-with-ape.html) | Source of that animation. Open the file in a browser to play it. |
 | [README.md](./README.md) | Orientation and adoption guide (this file)                                                |
 | [integrations/](./integrations/) | How existing tools produce or consume these entities (mapping, examples, verification) |
 

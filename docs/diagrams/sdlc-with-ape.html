@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDLC with APE — Agentic Process Evidence</title>
+<style>
+:root{
+  --ink:#0f1720;
+  --muted:#5c6773;
+  --line:#e1e5e9;
+  --accent:#1b7a4c;
+  --accent-deep:#145a38;
+  --paper:#f5f4f0;
+  --card:#fff;
+  --soft:#eaf5ef;
+  --green-bd:#5aa57e;
+  --amber:#b5790a;
+  --amber-bd:#cf9a3c;
+  --amber-soft:#fdf6e8;
+  --amber-ink:#8a5a08;
+  --amber-line:#c58b26;
+  --line-idle:#b7cfc2;
+  --ring:rgba(27,122,76,.14);
+  --shadow-card:0 1px 2px rgba(15,23,32,.05), 0 14px 30px -16px rgba(15,23,32,.20);
+  --move:0.85s;
+  --fade:0.9s;
+  --ease:cubic-bezier(0.22, 1, 0.36, 1);
+  --step-w:184px;
+  --conn-w:56px;
+  --card-h:208px;
+  --pr-shift:0px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;color:var(--ink);
+  background:radial-gradient(circle at 1px 1px, rgba(15,23,32,.07) 1px, transparent 0) 0 0/22px 22px, var(--paper);
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+.deck{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 20px 64px;
+  user-select:none;
+}
+.canvas{
+  position:relative;
+  display:flex;flex-direction:column;align-items:stretch;
+  width:max-content;
+  max-width:100%;
+  gap:0;
+}
+
+.pipeline{
+  display:flex;align-items:flex-start;justify-content:center;
+  width:max-content;
+}
+.step{
+  position:relative;z-index:3;
+  flex:0 0 auto;width:var(--step-w);
+  display:flex;flex-direction:column;align-items:stretch;
+  transition:width var(--move) var(--ease), opacity var(--move) var(--ease);
+}
+.step.is-insert{
+  width:0;opacity:0;overflow:hidden;pointer-events:none;
+  transition-delay:0.45s;
+}
+.deck.show-steps .step.is-insert{
+  width:var(--step-w);opacity:1;pointer-events:auto;transition-delay:0s;
+}
+.deck.show-steps .step.is-insert[data-step="pr"]{transition-delay:0.12s;}
+.deck.show-steps .step.is-insert[data-step="release"]{transition-delay:0.28s;}
+.deck.show-providers .step.is-insert{transition-delay:0s;}
+
+.base-node{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:0 14px 16px;
+  box-shadow:var(--shadow-card);
+  height:var(--card-h);
+  display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+  flex-shrink:0;
+  transition:background .5s var(--ease), border-color .5s var(--ease), box-shadow .5s var(--ease);
+}
+.base-node.pulse{border-color:var(--accent);box-shadow:0 0 0 5px var(--ring), var(--shadow-card);}
+.base-node.is-released{border-color:var(--accent);background:linear-gradient(180deg,#f2faf5 0%,#e3f2e9 100%);box-shadow:0 0 0 6px var(--ring), 0 18px 36px -18px rgba(20,90,56,.45);}
+.base-node h2{
+  margin:0;height:96px;flex:0 0 96px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:19px;font-weight:650;color:var(--ink);
+  letter-spacing:-.018em;line-height:1.2;text-align:center;white-space:nowrap;
+}
+
+/* rotating "agent working" arrow */
+.spin{
+  width:22px;height:22px;flex:none;
+  fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  animation:spin 1.4s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* same arrow, shown only while that stage is working */
+.spin.work{opacity:0;transition:opacity .4s var(--ease);}
+.spin.work.on{opacity:1;}
+
+/* chips that live inside cards / on the Artifactory shelf */
+.slot{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.slot.local{align-items:flex-start;}
+.lc{display:flex;gap:6px;align-items:center;}
+/* Agent work: commits form one clean column; each commit's logs sit to its left,
+   and a second log on the same commit is overlapped diagonally, like a small deck */
+.lg{position:relative;flex:none;width:30px;height:29px;}
+.lg .chip.mini{position:absolute;left:0;top:3px;}
+.lg .chip.mini + .chip.mini{left:5px;top:7px;}
+#agentLocal{gap:6px;}
+#agentLocal .lc{gap:10px;}
+.chip.mini{width:22px;padding:0;justify-content:center;}
+.chip.mini span{display:none;}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  height:22px;padding:0 8px;border-radius:7px;border:1px solid;
+  font-size:11px;font-weight:650;letter-spacing:.01em;white-space:nowrap;
+  box-shadow:0 1px 1.5px rgba(15,23,32,.06);
+  opacity:0;transform:translateY(4px) scale(.96);
+  transition:opacity .45s var(--ease), transform .45s var(--ease);
+}
+.chip svg{width:12px;height:12px;flex:none;}
+.chip.on{opacity:1;transform:none;}
+.chip.on.sent{opacity:.38;filter:saturate(.6);}
+.chip.ghost{opacity:.1;transform:none;transition:none;}
+.chip.fill{opacity:1;transform:none;transition:opacity var(--build-ms,4400ms) linear;}
+.chip.commit,.chip.artifact{background:var(--soft);border-color:var(--green-bd);color:var(--accent-deep);}
+.chip.commit{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,monospace;font-size:10.5px;font-weight:600;letter-spacing:0;}
+.chip.log,.chip.evidence{background:var(--amber-soft);border-color:var(--amber-bd);color:var(--amber-ink);}
+
+/* notary engine inside Agent works: takes the logs, produces provenance evidence */
+.step[data-step="agent"] .base-node{height:344px;}
+.notary.agentwork{margin-top:0;}
+/* Runtime tool: the received logs form a diagonal pile (positions are set per chip) */
+.ng{position:relative;flex:none;}
+.ng .chip.mini{position:absolute;}
+/* Gate: small card sitting ON Deployment's bottom border - the border runs through the Gate's vertical middle */
+.step[data-step="release"] .base-node{height:164px;position:relative;}
+.deck.show-steps .step.is-insert[data-step="release"]{overflow:visible;} /* let the Gate hang below the card */
+/* the artifact once it is in Deployment: a bit bigger, white background */
+#gateSlot .chip{width:30px;height:28px;background:#fff;border-radius:8px;}
+#gateSlot .chip svg{width:17px;height:17px;}
+/* Gate input: the process evidence arrives as a diagonal pile of 4 chips, then the Gate reads them one by one */
+.gp{position:relative;flex:none;}
+.gp .chip{
+  position:absolute;width:126px;justify-content:center;
+  transition:opacity .45s var(--ease), transform .3s var(--ease), box-shadow .3s var(--ease), background .3s var(--ease), border-color .3s var(--ease), color .3s var(--ease);
+}
+.gp .chip > span{visibility:hidden;}   /* only the evidence on top of the pile carries the label */
+.gp .chip.gtop > span{visibility:visible;}
+.gp .chip.gcur{z-index:10;transform:translate(-3px,-3px);box-shadow:0 0 0 3px var(--ring), 0 4px 10px -4px rgba(20,90,56,.4);border-color:var(--accent);}
+/* once read, the top evidence is taken off the stack so the next one underneath is visibly the one being read */
+.gp .chip.gread{background:var(--soft);border-color:var(--accent);color:var(--accent-deep);opacity:0;transform:translate(12px,-8px);}
+.notary.gate{
+  position:absolute;left:14px;right:14px;bottom:-.5px;margin-top:0;
+  transform:translateY(50%);
+}
+.notary{
+  margin-top:10px;
+  background:linear-gradient(180deg,#ffffff 0%,#f8fbf9 100%);
+  border:1px solid rgba(27,122,76,.42);border-radius:12px;
+  padding:7px 6px 9px;
+  box-shadow:inset 0 1px 0 #fff, 0 1px 2px rgba(15,23,32,.04);
+  display:flex;flex-direction:column;align-items:stretch;gap:6px;
+  transition:background .4s var(--ease), box-shadow .4s var(--ease), border-color .4s var(--ease);
+}
+.notary.busy{background:var(--soft);border-color:var(--accent);box-shadow:0 0 0 4px var(--ring);}
+.notary-h{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  height:18px;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  line-height:18px;white-space:nowrap;color:var(--accent-deep);
+}
+.notary-h{position:relative;}.notary .spin{position:absolute;right:2px;top:1px;width:16px;height:16px;}
+.gate-pass{
+  position:absolute;right:1px;top:0;width:18px;height:18px;
+  opacity:0;transform:scale(.5);
+  transition:opacity .35s var(--ease), transform .4s var(--ease);
+}
+.gate-pass.on{opacity:1;transform:none;}
+.slot.nrow{flex-direction:row;justify-content:center;align-items:center;gap:4px;}
+
+/* policies inside the policy engine: each one evaluates, then adds its own evidence */
+.prow{display:flex;align-items:center;gap:6px;}
+.chip.policy{
+  opacity:1;transform:none;
+  background:#fff;border-color:var(--green-bd);color:var(--accent-deep);
+  transition:background .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
+}
+.chip.policy.active{background:var(--soft);border-color:var(--accent);box-shadow:0 0 0 3px var(--ring);}
+.pe{position:relative;width:22px;height:22px;flex:none;}
+.pe .spin{position:absolute;left:3px;top:3px;width:16px;height:16px;}
+
+.commit-channel{
+  height:var(--card-h);
+}
+.conn.is-commit .shaft,
+.deck:not(.show-steps) .conn.after-pr .shaft{background:transparent;}
+.conn.is-commit .shaft::after,
+.deck:not(.show-steps) .conn.after-pr .shaft::after{content:none;}
+
+.conn{
+  flex:0 0 var(--conn-w);width:var(--conn-w);
+  align-self:flex-start;margin-top:47px;
+  display:flex;align-items:center;
+  transition:width var(--move) var(--ease), flex-basis var(--move) var(--ease), opacity var(--move) var(--ease);
+}
+.conn.is-insert{
+  width:0;flex-basis:0;opacity:0;overflow:hidden;transition-delay:0.45s;
+}
+.deck.show-steps .conn.is-insert{
+  width:var(--conn-w);flex-basis:var(--conn-w);opacity:1;transition-delay:0s;
+}
+
+/* Source + CICD card sits a bit left; the arrow after it stretches so Deployment stays put */
+.step[data-step="pr"]{margin-left:calc(-1 * var(--pr-shift));}
+/* Source control is a pass-through: a small card, title on the same line as the commit flow */
+/* Source control and CI sit level with the Agent work box (agent card border 1px + title 96px) */
+.step[data-step="source"],.step[data-step="pr"]{margin-top:97px;}
+.step[data-step="source"]{width:120px;}
+.step[data-step="source"] .base-node{height:140px;}
+.step[data-step="source"] h2{white-space:normal;align-items:center;padding-top:0;font-size:17px;}
+/* CI is the same size as Source control (120 x 140). The title stays centred on the flow line;
+   the chips tuck up under it, and the working arrow sits in the title row instead of beside the chip */
+.deck.show-steps .step.is-insert[data-step="pr"]{width:120px;}
+.step[data-step="pr"] .base-node{height:140px;}
+.step[data-step="pr"] h2{position:relative;margin-bottom:-24px;}
+.step[data-step="pr"] h2 .spin{position:absolute;right:4px;top:50%;margin-top:-11px;}
+.conn.after-pr{flex-basis:calc(var(--conn-w) + var(--pr-shift));width:calc(var(--conn-w) + var(--pr-shift));}
+
+.shaft{flex:1;height:2px;background:var(--accent);position:relative;}
+.shaft::after{
+  content:"";position:absolute;right:-1px;top:-5px;
+  border:6px solid transparent;border-left:8px solid var(--accent);
+}
+
+/* —— APE layer under SDLC —— */
+.registry-wrap{
+  width:100%;
+  display:grid;grid-template-rows:0fr;opacity:0;
+  transition:grid-template-rows var(--fade) var(--ease), opacity var(--fade) var(--ease), margin-top var(--move) var(--ease);
+  margin-top:0;
+}
+.registry-wrap > .registry-inner{overflow:hidden;}
+.deck.show-shelf .registry-wrap{
+  grid-template-rows:1fr;opacity:1;margin-top:120px;transition-delay:0.25s;
+}
+.deck.show-shelf .registry-wrap > .registry-inner{overflow:visible;}
+.deck.show-session .registry-wrap{transition-delay:0s;}
+.deck:not(.show-shelf) .registry-wrap{transition-delay:0s;}
+.artifactory-registry{margin-left:100px;}
+.registry-inner{position:relative;display:flex;justify-content:center;}
+.policy-engine{
+  position:absolute;left:0;top:68px;transform:translateY(-50%);
+  width:var(--step-w);z-index:3;
+  background:var(--card);border:1px solid rgba(27,122,76,.5);border-radius:16px;
+  padding:15px 15px 17px;
+  box-shadow:var(--shadow-card);
+  display:flex;flex-direction:column;align-items:stretch;gap:10px;
+  transition:background .4s var(--ease), box-shadow .4s var(--ease);
+}
+.policy-engine.busy{background:linear-gradient(180deg,#f2faf5,#e7f4ec);border-color:var(--accent);box-shadow:0 0 0 5px var(--ring), var(--shadow-card);}
+.policy-engine h2{margin:0;font-size:19px;font-weight:650;letter-spacing:-.018em;line-height:1.2;text-align:center;}
+
+/* APE components (Runtime tool, Policy engine, Gate) share the orange of the APE lines */
+#notary, .notary.gate, .policy-engine{
+  border-color:rgba(197,139,38,.6);
+  background:linear-gradient(180deg,#ffffff 0%,#fffaf1 100%);
+}
+#notary .notary-h, .notary.gate .notary-h{color:var(--amber-ink);}
+.policy-engine h2{color:var(--ink);}
+#notary .spin, .notary.gate .spin, .policy-engine .spin{stroke:var(--amber-line);}
+#notary.busy, .notary.gate.busy{
+  background:linear-gradient(180deg,#fff8ea 0%,#fcefd6 100%);
+  border-color:var(--amber-line);box-shadow:0 0 0 4px rgba(197,139,38,.18);
+}
+.policy-engine.busy{
+  background:linear-gradient(180deg,#fff8ea 0%,#fcefd6 100%);
+  border-color:var(--amber-line);box-shadow:0 0 0 5px rgba(197,139,38,.18), var(--shadow-card);
+}
+.policy-engine .chip.policy, .legend .chip.policy{border-color:var(--amber-bd);color:var(--amber-ink);}
+.policy-engine .chip.policy svg path, .legend .chip.policy svg path{stroke:var(--amber-ink);}
+.policy-engine .chip.policy.active{background:var(--amber-soft);border-color:var(--amber-line);box-shadow:0 0 0 3px rgba(197,139,38,.18);}
+.notary.gate .gp .chip.gcur{border-color:var(--amber-line);box-shadow:0 0 0 3px rgba(197,139,38,.2), 0 4px 10px -4px rgba(138,90,8,.4);}
+
+.ape-links{
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;overflow:visible;z-index:2;
+  opacity:0;transition:opacity var(--fade) var(--ease);
+}
+.deck.show-session .ape-links{opacity:1;transition-delay:0.15s;}
+
+.commit-links{
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;overflow:visible;z-index:4;
+}
+
+/* flow lines: every line the same faded shade until something rides it, then its own colour */
+.squiggle{
+  fill:none;stroke:var(--line-idle);stroke-width:2.25;stroke-linecap:round;
+  transition:stroke .35s var(--ease), stroke-width .35s var(--ease);
+}
+.squiggle.on{stroke-width:2.75;filter:url(#lineGlow);}
+/* lines between the APE parts stay orange: faded at rest, full while something rides them */
+.squiggle.session{stroke:#e4cba0;}
+.squiggle.on.session{stroke:var(--amber-line);}
+.squiggle.on.evidence,.squiggle.on.commit{stroke:var(--accent);}
+.squiggle.hide{opacity:0;}
+
+.flow-pill{opacity:0;filter:url(#pillShadow);}
+.flow-pill rect{stroke-width:1.25;}
+.flow-pill.session rect{fill:var(--amber-soft);stroke:var(--amber-bd);}
+.flow-pill.session text{fill:var(--amber-ink);}
+.flow-pill.session rect.bundle{fill:#fff;stroke:var(--amber-bd);stroke-width:1.5;}
+.flow-pill.evidence rect{fill:var(--soft);stroke:var(--green-bd);}
+.flow-pill.evidence rect.bundle{fill:#fff;stroke:var(--accent);stroke-width:1.5;}
+.flow-pill.evidence rect.ev{fill:var(--amber-soft);stroke:var(--amber-bd);}
+.flow-pill.evidence text.ev{fill:#8a5a08;}
+.flow-pill.evidence text{fill:var(--accent-deep);}
+.flow-pill.commit rect{fill:var(--soft);stroke:var(--green-bd);}
+.flow-pill.commit text{fill:var(--accent-deep);}
+/* envelope icons keep their own white body + amber outline; the pill-colour rules above must not recolour them */
+.flow-pill.flow-pill rect[rx="1.2"]{fill:#fff;stroke:#8a5a08;stroke-width:1.3;}
+.flow-pill text{
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,sans-serif;
+  font-size:11px;font-weight:650;text-anchor:middle;
+}
+
+.artifactory-registry{
+  position:relative;z-index:3;
+  display:flex;flex-direction:column;align-items:center;
+  gap:14px;
+  opacity:0;transform:translateY(12px);
+  transition:opacity var(--fade) var(--ease), transform var(--fade) var(--ease);
+}
+.deck.show-shelf .artifactory-registry{opacity:1;transform:translateY(0);transition-delay:0.35s;}
+.deck.show-session .artifactory-registry{transition-delay:0s;}
+.af-circle{
+  width:136px;height:136px;border-radius:50%;
+  border:2px solid var(--accent);
+  background:radial-gradient(circle at 34% 28%, #ffffff 0%, #eef8f2 48%, #d8eee1 100%);
+  box-shadow:0 0 0 7px rgba(27,122,76,.06), 0 18px 34px -16px rgba(20,90,56,.45);
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:18px;
+  color:var(--accent-deep);
+  font-size:15.5px;font-weight:700;letter-spacing:-.015em;line-height:1.2;
+  transition:box-shadow .5s var(--ease), transform .5s var(--ease);
+}
+.af-circle.pulse{box-shadow:0 0 0 11px var(--ring), 0 18px 34px -16px rgba(20,90,56,.5);transform:scale(1.03);}
+/* Artifactory contents: each one is its own card, in a row just above the registry circle */
+/* registry: circle at the left, the Artifactory stack overlaps its right edge */
+.af-stack{position:relative;width:136px;height:136px;flex:none;}
+.af-line{
+  position:absolute;left:-30px;top:calc(100% + 6px);width:196px;height:3px;border-radius:2px;
+  background:linear-gradient(90deg, rgba(183,207,194,0) 0%, var(--line-idle) 18%, var(--line-idle) 82%, rgba(183,207,194,0) 100%);
+}
+/* the stack appears as one vertical card (Artifact, Evidence, Provenance, Logs top to bottom) */
+.af-shelf{
+  position:absolute;left:calc(100% - 26px);top:50%;transform:translateY(-50%);z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:9px 17px 15px 9px;border:1px solid transparent;border-radius:12px;
+  transition:background .4s var(--ease), border-color .4s var(--ease), box-shadow .4s var(--ease);
+}
+.af-shelf:has(.chip.on){background:var(--card);border-color:rgba(27,122,76,.5);box-shadow:var(--shadow-card);}
+.af-shelf .chip.mini{width:22px;}
+.af-shelf .chip{width:104px;height:22px;justify-content:center;background:#fff;border-radius:7px;}
+/* several items of one kind read as a pile: offset copies behind the top card */
+/* both piles step 3px down-right, so the evidence stack and the log stack read the same */
+.af-shelf .chip.multi{box-shadow:3px 3px 0 0 #fff,3px 3px 0 1px var(--amber-bd),6px 6px 0 0 #fff,6px 6px 0 1px var(--amber-bd);}
+.af-pile{position:relative;isolation:isolate;width:22px;height:22px;margin-bottom:3px;}
+.af-pile > .pile-back{
+  position:absolute;left:3px;top:3px;z-index:-1;
+  box-shadow:3px 3px 0 0 #fff,3px 3px 0 1px var(--amber-bd);
+}
+
+html.snap .step,
+html.snap .conn,
+html.snap .registry-wrap,
+html.snap .artifactory-registry,
+html.snap .ape-links,
+html.snap .squiggle,
+html.snap .flow-pill{
+  transition:none !important;
+  animation:none !important;
+}
+
+/* page header */
+.page-head{margin:0 0 34px;text-align:center;}
+.page-head h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.025em;line-height:1.15;color:var(--ink);}
+
+/* legend: bottom right of the page */
+.deck{position:relative;}
+.legend{
+  position:absolute;right:20px;bottom:20px;z-index:6;width:144px;
+  background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:14px;
+  padding:12px 14px 8px;backdrop-filter:blur(6px);
+  font-size:12px;font-weight:500;line-height:1.2;color:#2f3a44;
+  box-shadow:0 1px 2px rgba(16,20,24,.04), 0 8px 20px rgba(16,20,24,.06);
+}
+.legend h3{
+  margin:0 0 4px;padding-bottom:8px;border-bottom:1px solid var(--line);
+  font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6b7680;
+}
+.legend .lr{display:grid;grid-template-columns:22px 1fr;align-items:center;column-gap:12px;height:30px;}
+.legend .lr .sw{display:flex;align-items:center;justify-content:center;}
+.legend .chip{opacity:1;transform:none;height:22px;transition:none;}
+.legend .chip.mini{width:22px;}
+.legend .swatch{width:22px;height:8px;border-radius:4px;}
+.legend .swatch.sdlc{background:var(--accent);}
+.legend .swatch.ape{background:var(--amber-line);}
+.legend .lr.tone{margin-top:4px;border-top:1px solid var(--line);height:34px;}
+
+@media (prefers-reduced-motion: reduce){
+  .step,.conn,.registry-wrap,.ape-links,.commit-links,.squiggle,.flow-pill,.artifactory-registry,.chip,.base-node,.policy-engine,.af-circle{
+    transition-duration:0.01ms!important;transition-delay:0s!important;
+  }
+  .spin{animation:none;}
+}
+</style>
+</head>
+<body>
+<main class="deck phase-1" id="deck" tabindex="0">
+  <header class="page-head">
+    <h1>Agentic Process Evidence SDLC</h1>
+  </header>
+  <div class="canvas">
+    <svg class="ape-links" id="apeSvg" aria-hidden="true" role="img" aria-label="Session logs, artifact and process evidence flows">
+      <defs>
+        <filter id="pillShadow" x="-30%" y="-40%" width="160%" height="200%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2.4" flood-color="#0f1720" flood-opacity=".16"/>
+        </filter>
+        <filter id="lineGlow" x="-10%" y="-10%" width="120%" height="120%" filterUnits="userSpaceOnUse">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2.2" result="b"/>
+          <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .45 0" result="g"/>
+          <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <path id="flow-session-down" class="squiggle session"/>
+      <path id="flow-policy-in" class="squiggle session"/>
+      <path id="flow-artifact" class="squiggle evidence"/>
+      <path id="flow-evidence-back" class="squiggle session"/>
+      <path id="flow-artifact-up" class="squiggle evidence"/>
+      <path id="flow-evidence-up" class="squiggle session"/>
+
+      <!-- small session-log pills (3 ride together: to Artifactory, then to the policy engine) -->
+      <g id="pill-log-0" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,1)"><path d="M-6,-8 h8 l4,4 v12 h-12 z" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M2,-8 v4 h4" fill="none" stroke="#8a5a08" stroke-width="1.3"/><path d="M-4,-1 h6 M-4,2.5 h6 M-4,6 h4" fill="none" stroke="#8a5a08" stroke-width="1.1"/></g></g>
+      <g id="pill-log-1" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,1)"><path d="M-6,-8 h8 l4,4 v12 h-12 z" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M2,-8 v4 h4" fill="none" stroke="#8a5a08" stroke-width="1.3"/><path d="M-4,-1 h6 M-4,2.5 h6 M-4,6 h4" fill="none" stroke="#8a5a08" stroke-width="1.1"/></g></g>
+      <g id="pill-log-2" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,1)"><path d="M-6,-8 h8 l4,4 v12 h-12 z" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M2,-8 v4 h4" fill="none" stroke="#8a5a08" stroke-width="1.3"/><path d="M-4,-1 h6 M-4,2.5 h6 M-4,6 h4" fill="none" stroke="#8a5a08" stroke-width="1.1"/></g></g>
+
+      <g id="pill-log-3" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,1)"><path d="M-6,-8 h8 l4,4 v12 h-12 z" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M2,-8 v4 h4" fill="none" stroke="#8a5a08" stroke-width="1.3"/><path d="M-4,-1 h6 M-4,2.5 h6 M-4,6 h4" fill="none" stroke="#8a5a08" stroke-width="1.1"/></g></g>
+      <!-- notary engine -> registry: ONE bundle, provenance evidence on top, the session logs (one element) under it -->
+      <g id="pill-prov" class="flow-pill session">
+        <rect class="bundle" x="-76" y="-37" width="152" height="74" rx="12"/>
+        <g transform="translate(0,-17)">
+          <rect x="-68" y="-14" width="136" height="28" rx="8"/>
+          <g class="env" transform="translate(-44,0)">
+            <rect x="-9" y="-6" width="18" height="13" rx="1.2" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/>
+            <path d="M-9,-6 L0,2 L9,-6" fill="none" stroke="#8a5a08" stroke-width="1.3"/>
+          </g>
+          <text x="10" y="4">Provenance</text>
+        </g>
+        <g transform="translate(0,17)">
+          <rect x="-68" y="-14" width="136" height="28" rx="8"/>
+          <g transform="translate(-44,1)"><path d="M-6,-8 h8 l4,4 v12 h-12 z" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M2,-8 v4 h4" fill="none" stroke="#8a5a08" stroke-width="1.3"/><path d="M-4,-1 h6 M-4,2.5 h6 M-4,6 h4" fill="none" stroke="#8a5a08" stroke-width="1.1"/></g>
+          <text id="pill-prov-logs" x="10" y="4">Logs</text>
+        </g>
+      </g>
+      <g id="pill-artifact" class="flow-pill evidence">
+        <rect x="-17" y="-14" width="34" height="28" rx="8"/>
+        <g transform="translate(0,0)">
+          <path d="M0,-7 L7,-3.5 V3.5 L0,7 L-7,3.5 V-3.5 Z" fill="#fff" stroke="#145a38" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M-7,-3.5 L0,0 L7,-3.5 M0,0 V7" fill="none" stroke="#145a38" stroke-width="1.1"/>
+        </g>
+      </g>
+      <!-- one evidence pill per policy, policy engine -> registry -->
+      <g id="pill-ev-0" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,0.5)"><rect x="-9" y="-6" width="18" height="13" rx="1.2" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M-9,-6 L0,2 L9,-6" fill="none" stroke="#8a5a08" stroke-width="1.3"/></g></g>
+      <g id="pill-ev-1" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,0.5)"><rect x="-9" y="-6" width="18" height="13" rx="1.2" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M-9,-6 L0,2 L9,-6" fill="none" stroke="#8a5a08" stroke-width="1.3"/></g></g>
+      <g id="pill-ev-2" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,0.5)"><rect x="-9" y="-6" width="18" height="13" rx="1.2" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M-9,-6 L0,2 L9,-6" fill="none" stroke="#8a5a08" stroke-width="1.3"/></g></g>
+      <!-- evidence alone: Artifactory -> Release gate, on the orange line -->
+      <g id="pill-evidence-up" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,0.5)"><rect x="-9" y="-6" width="18" height="13" rx="1.2" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M-9,-6 L0,2 L9,-6" fill="none" stroke="#8a5a08" stroke-width="1.3"/></g></g>
+    </svg>
+    <svg class="commit-links" id="commitSvg" aria-hidden="true" role="img" aria-label="Last commit goes to source control, then on to CICD">
+      <path id="flow-commit" class="squiggle commit"/>
+      <path id="flow-commit2" class="squiggle commit"/>
+      <!-- first stretch of the registry line: from the Runtime tool box's right edge out of the card -->
+      <path id="flow-prov-out" class="squiggle session"/>
+      <!-- logs flying from the agent's log chips into the notary engine (hidden guide paths) -->
+      <path id="flow-n0" class="squiggle hide"/>
+      <path id="flow-n1" class="squiggle hide"/>
+      <path id="flow-n2" class="squiggle hide"/>
+      <path id="flow-n3" class="squiggle hide"/>
+      <g id="pill-nlog-0" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,1)"><path d="M-6,-8 h8 l4,4 v12 h-12 z" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M2,-8 v4 h4" fill="none" stroke="#8a5a08" stroke-width="1.3"/><path d="M-4,-1 h6 M-4,2.5 h6 M-4,6 h4" fill="none" stroke="#8a5a08" stroke-width="1.1"/></g></g>
+      <g id="pill-nlog-1" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,1)"><path d="M-6,-8 h8 l4,4 v12 h-12 z" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M2,-8 v4 h4" fill="none" stroke="#8a5a08" stroke-width="1.3"/><path d="M-4,-1 h6 M-4,2.5 h6 M-4,6 h4" fill="none" stroke="#8a5a08" stroke-width="1.1"/></g></g>
+      <g id="pill-nlog-2" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,1)"><path d="M-6,-8 h8 l4,4 v12 h-12 z" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M2,-8 v4 h4" fill="none" stroke="#8a5a08" stroke-width="1.3"/><path d="M-4,-1 h6 M-4,2.5 h6 M-4,6 h4" fill="none" stroke="#8a5a08" stroke-width="1.1"/></g></g>
+      <g id="pill-nlog-3" class="flow-pill session"><rect x="-17" y="-14" width="34" height="28" rx="8"/><g transform="translate(0,1)"><path d="M-6,-8 h8 l4,4 v12 h-12 z" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M2,-8 v4 h4" fill="none" stroke="#8a5a08" stroke-width="1.3"/><path d="M-4,-1 h6 M-4,2.5 h6 M-4,6 h4" fill="none" stroke="#8a5a08" stroke-width="1.1"/></g></g>
+      <g id="pill-commit" class="flow-pill commit">
+        <rect x="-17" y="-14" width="34" height="28" rx="8"/>
+        <g>
+          <circle cx="0" cy="0" r="3.4" fill="#fff" stroke="#145a38" stroke-width="1.4"/>
+          <path d="M-9 0h5.2M3.8 0h5.2" fill="none" stroke="#145a38" stroke-width="1.4" stroke-linecap="round"/>
+        </g>
+      </g>
+    </svg>
+    <div class="pipeline" id="pipeline">
+      <div class="step" data-step="agent">
+        <article class="base-node">
+          <h2>Agent machine</h2>
+          <div class="notary agentwork" id="agentWork">
+            <div class="notary-h"><span>Agent work</span><svg class="spin work" id="agentSpin" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></div>
+            <div class="slot local" id="agentLocal"></div>
+          </div>
+          <div class="notary" id="notary">
+            <div class="notary-h" id="notaryHead"><span>Runtime tool</span></div>
+            <div class="slot nrow" id="notarySlot"></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="conn is-commit"><div class="shaft"></div></div>
+
+      <div class="step" data-step="source">
+        <article class="base-node"><h2>Source control</h2><div class="slot" id="sourceSlot"></div></article>
+      </div>
+
+      <div class="conn is-insert is-commit"><div class="shaft"></div></div>
+
+      <div class="step is-insert" data-step="pr">
+        <article class="base-node"><h2>CI</h2><div class="slot" id="remoteSlot"></div></article>
+      </div>
+
+      <div class="conn is-commit after-pr"><div class="shaft"></div></div>
+
+      <div class="step is-insert" data-step="release">
+        <article class="base-node">
+          <h2>Deployment</h2>
+          <div class="slot" id="gateSlot"></div>
+          <div class="notary gate" id="gateBox">
+            <div class="notary-h" id="gateHead"><span>Gate</span><svg class="gate-pass" id="gatePass" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.2l3.2 3.2L13 4.4" fill="none" stroke="#1b7a4c" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="slot" id="gateBoxSlot"></div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="registry-wrap" aria-hidden="true">
+      <div class="registry-inner">
+        <div class="artifactory-registry">
+          <div class="af-stack">
+            <div class="af-circle">Artifact registry</div>
+            <div class="af-line"></div>
+            <div class="af-shelf" id="afShelf"></div>
+          </div>
+        </div>
+        <article class="policy-engine"><h2>Policy engine</h2><div class="slot" id="policySlot"></div></article>
+      </div>
+    </div>
+  </div>
+
+  <aside class="legend" id="legend" aria-label="Legend"></aside>
+
+</main>
+<script>
+(function(){
+  var deck = document.getElementById('deck');
+  var phase = 1;
+  var layoutTimer = 0;
+  var runToken = 0;
+  var timers = [];
+  var started = false;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function $(id){ return document.getElementById(id); }
+  function q(sel){ return document.querySelector(sel); }
+
+  /* ---------- chips (built once, toggled by the timeline) ---------- */
+  var ICON = {
+    commit: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3" fill="#fff" stroke="#145a38" stroke-width="1.5"/><path d="M0 8h5M11 8h5" fill="none" stroke="#145a38" stroke-width="1.5" stroke-linecap="round"/></svg>',
+    log: '<svg viewBox="0 0 16 16"><path d="M4 1.5h5l3 3v10H4z" fill="#fff" stroke="#8a5a08" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 1.5v3h3M6 8h4M6 11h4" fill="none" stroke="#8a5a08" stroke-width="1.2"/></svg>',
+    env: '<svg viewBox="0 0 16 16"><rect x="1.5" y="3.5" width="13" height="9" rx="1.2" fill="#fff" stroke="#8a5a08" stroke-width="1.3"/><path d="M1.5 3.5L8 9l6.5-5.5" fill="none" stroke="#8a5a08" stroke-width="1.3"/></svg>',
+    pkg: '<svg viewBox="0 0 16 16"><path d="M8 1.5L14 5v6L8 14.5 2 11V5z" fill="#fff" stroke="#145a38" stroke-width="1.3" stroke-linejoin="round"/><path d="M2 5l6 3.5L14 5M8 8.5v6" fill="none" stroke="#145a38" stroke-width="1.1"/></svg>'
+  };
+  ICON.shield = '<svg viewBox="0 0 16 16"><path d="M8 1.5l5.5 2v4.2c0 3.2-2.3 5.6-5.5 6.8C4.8 13.3 2.5 10.9 2.5 7.7V3.5z" fill="#fff" stroke="#145a38" stroke-width="1.3" stroke-linejoin="round"/><path d="M5.5 8l1.8 1.8L10.6 6.4" fill="none" stroke="#145a38" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var allChips = [];
+  function chip(kind, icon, label){
+    var el = document.createElement('span');
+    el.className = 'chip ' + kind;
+    el.innerHTML = ICON[icon] + '<span>' + label + '</span>';
+    allChips.push(el);
+    return el;
+  }
+
+  /* ---------- legend (static; chips here are not part of the timeline) ---------- */
+  (function buildLegend(){
+    var el = $('legend');
+    function lchip(kind, icon, label){
+      return '<span class="chip ' + kind + '">' + ICON[icon] + '<span>' + label + '</span></span>';
+    }
+    function row(sw, text){
+      return '<div class="lr"><div class="sw">' + sw + '</div><div>' + text + '</div></div>';
+    }
+    el.innerHTML =
+      '<h3>Legend</h3>' +
+      row(lchip('commit mini', 'commit', ''), 'Commit') +
+      row(lchip('log mini', 'log', ''), 'Session log') +
+      row(lchip('evidence mini', 'env', ''), 'Evidence') +
+      row(lchip('artifact mini', 'pkg', ''), 'Artifact') +
+      row(lchip('policy mini', 'shield', ''), 'Policy') +
+      '<div class="lr tone"><div class="sw"><span class="swatch sdlc"></span></div><div>SDLC</div></div>' +
+      '<div class="lr"><div class="sw"><span class="swatch ape"></span></div><div>APE</div></div>';
+  })();
+
+  // each commit can have several session logs; counts per commit
+  var HASH = ['a1f3c2d', 'b72e90a', 'c4d81f6'];
+  var LOGS_PER_COMMIT = [1, 2, 1];
+  var commitChips = [], logGroups = [], logChips = [];
+  var agentLocal = $('agentLocal');
+  HASH.forEach(function(h, i){
+    var row = document.createElement('div');
+    row.className = 'lc';
+    var c = chip('commit', 'commit', h);
+    var group = document.createElement('div');
+    group.className = 'lg';
+    var mine = [];
+    for (var j = 0; j < LOGS_PER_COMMIT[i]; j++){
+      var l = chip('log mini', 'log', '');
+      group.appendChild(l); mine.push(l); logChips.push(l);
+    }
+    row.appendChild(group); row.appendChild(c); // logs sit to the left of their commit
+    agentLocal.appendChild(row);
+    commitChips.push(c); logGroups.push(mine);
+  });
+
+  // "working" arrow, identical to the one in Agent works; toggled by the timeline
+  var spinners = [];
+  var agentSpin = $('agentSpin');
+  spinners.push(agentSpin);
+  function workSpin(){
+    var wrap = document.createElement('div');
+    wrap.innerHTML = '<svg class="spin work" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>';
+    var s = wrap.firstChild;
+    spinners.push(s);
+    return s;
+  }
+
+  // notary engine (inside Agent works): collects the logs, then produces the provenance evidence
+  var notary = $('notary');
+  var notarySpin = workSpin();
+  $('notaryHead').appendChild(notarySpin);
+  // received logs pile up diagonally: one small log chip per log, each switched on as that log arrives
+  var N_DX = 5, N_DY = 4;
+  var nLogChips = [];
+  var nStack = document.createElement('div');
+  nStack.className = 'ng';
+  nStack.style.width = (22 + (logChips.length - 1) * N_DX) + 'px';
+  nStack.style.height = (22 + (logChips.length - 1) * N_DY) + 'px';
+  logChips.forEach(function(_, i){
+    var lc = chip('log mini', 'log', '');
+    lc.style.left = (i * N_DX) + 'px';
+    lc.style.top = (i * N_DY) + 'px';
+    nStack.appendChild(lc); nLogChips.push(lc);
+  });
+  var nProvChip = chip('evidence', 'env', 'Provenance');
+  $('notarySlot').appendChild(nStack);
+  $('notarySlot').appendChild(nProvChip);
+
+  var remoteChip = chip('commit', 'commit', HASH[2]);
+  var remoteSpin = workSpin();
+  var remoteRow = document.createElement('div');
+  remoteRow.className = 'lc';
+  remoteRow.style.alignItems = 'center';
+  remoteRow.appendChild(remoteChip);
+  q('[data-step="pr"] h2').appendChild(remoteSpin); // working arrow lives in the title row
+  $('remoteSlot').appendChild(remoteRow);
+
+  // Source control just receives the commit and hands it on
+  var sourceChip = chip('commit', 'commit', HASH[2]);
+  $('sourceSlot').appendChild(sourceChip);
+
+  // artifact being built inside CICD: fades in from faint to solid while it works
+  var BUILD_MS = 4400;
+  var remoteArt = chip('artifact mini', 'pkg', '');
+  remoteArt.style.setProperty('--build-ms', BUILD_MS + 'ms');
+  $('remoteSlot').appendChild(remoteArt);
+  function startBuild(){
+    remoteArt.classList.remove('fill');
+    remoteArt.classList.add('ghost');
+    void remoteArt.offsetWidth;            // commit the faint start state
+    remoteArt.classList.remove('ghost');
+    remoteArt.classList.add('fill');       // now transition to solid
+  }
+  function endBuild(){
+    remoteArt.classList.remove('ghost', 'fill');
+  }
+
+  // policy engine: one row per policy; each evaluates (spinner) and then adds its own evidence chip
+  var POLICIES = ['Policy 1', 'Policy 2', 'Policy 3'];
+  var policyRows = [];
+  POLICIES.forEach(function(name){
+    var row = document.createElement('div');
+    row.className = 'prow';
+    var pc = chip('policy', 'shield', name);
+    allChips.pop();                       // policies are static: not toggled by resetState
+    var box = document.createElement('span');
+    box.className = 'pe';
+    var sp = workSpin();
+    var ev = chip('evidence mini', 'env', '');
+    box.appendChild(sp); box.appendChild(ev);
+    row.appendChild(pc); row.appendChild(box);
+    $('policySlot').appendChild(row);
+    policyRows.push({ chip: pc, spin: sp, ev: ev });
+  });
+
+  var gateArt = chip('artifact mini', 'pkg', '');
+  // the Gate (small card at the bottom of Deployment) reads the process evidence,
+  // then puts the artifact into the deployment
+  var gateBox = $('gateBox');
+  var gateSpin = workSpin();
+  $('gateHead').appendChild(gateSpin);
+  $('gateSlot').appendChild(gateArt);
+  // the process evidence arrives as a single chip, which the Gate reads
+  var G_W = 126, G_DX = 4, G_DY = 5;
+  var gateEvs = [];
+  var gStack = document.createElement('div');
+  gStack.className = 'gp';
+  var G_N = 1;   // the Gate receives ONE process-evidence chip
+  gStack.style.width = (G_W + (G_N - 1) * G_DX) + 'px';
+  gStack.style.height = (22 + (G_N - 1) * G_DY) + 'px';
+  for (var gi = 0; gi < G_N; gi++){
+    var ge = chip('evidence', 'env', 'Process evidence');
+    ge.style.left = (gi * G_DX) + 'px';
+    ge.style.top = (gi * G_DY) + 'px';
+    ge.style.zIndex = String(G_N - gi);   // first evidence on top: it is read first, then peeled off
+    gStack.appendChild(ge); gateEvs.push(ge);
+  }
+  gateEvs[0].classList.add('gtop');
+  $('gateBoxSlot').appendChild(gStack);
+
+  var shLogs = chip('log mini', 'log', '');
+  $('pill-prov-logs').textContent = 'Logs ×' + logChips.length;
+  var shProv = chip('evidence mini', 'env', '');
+  var shEv = chip('evidence mini', 'env', '');
+  var shArt = chip('artifact mini', 'pkg', '');
+  // top to bottom: Artifact, Evidence pile (policy evidence stacked behind the Evidence card), Logs pile
+  shEv.classList.add('pile-back'); shLogs.classList.add('multi');
+  var evPile = document.createElement('div');
+  evPile.className = 'af-pile';
+  evPile.appendChild(shEv); evPile.appendChild(shProv);
+  $('afShelf').appendChild(shArt);
+  $('afShelf').appendChild(evPile);
+  $('afShelf').appendChild(shLogs);
+
+  var sourceCard = q('[data-step="source"] .base-node');
+  var remoteCard = q('[data-step="pr"] .base-node'); // CICD
+  var gateCard = q('[data-step="release"] .base-node');
+  var policy = q('.policy-engine');
+  var circle = q('.af-circle');
+  var LOG_PILLS = ['pill-log-0', 'pill-log-1', 'pill-log-2', 'pill-log-3'];
+  var NLOG_PILLS = ['pill-nlog-0', 'pill-nlog-1', 'pill-nlog-2', 'pill-nlog-3'];
+  var EV_PILLS = ['pill-ev-0', 'pill-ev-1', 'pill-ev-2'];
+  var ALL_PILLS = LOG_PILLS.concat(NLOG_PILLS, EV_PILLS, ['pill-prov', 'pill-commit', 'pill-artifact', 'pill-evidence-up']);
+  var LINES = ['flow-session-down', 'flow-policy-in', 'flow-artifact', 'flow-evidence-back', 'flow-artifact-up', 'flow-evidence-up', 'flow-prov-out', 'flow-commit', 'flow-commit2'];
+
+  /* ---------- timeline engine ---------- */
+  function later(ms, fn){
+    var tok = runToken;
+    timers.push(window.setTimeout(function(){ if (tok === runToken) fn(); }, ms));
+  }
+
+  function pulse(el){
+    el.classList.add('pulse');
+    window.setTimeout(function(){ el.classList.remove('pulse'); }, 700);
+  }
+
+  function fly(pathId, pillId, dur, inset, done){
+    var path = $(pathId), pill = $(pillId), tok = runToken;
+    if (!path.getAttribute('d')) { if (done) done(); return; }
+    var len = path.getTotalLength();
+    var ins = inset ? Math.min(0.42, inset / len) : 0;
+    var t0 = null;
+    function frame(now){
+      if (tok !== runToken) return;
+      if (t0 === null) t0 = now;
+      var p = Math.min((now - t0) / dur, 1);
+      var e = 0.5 - 0.5 * Math.cos(Math.PI * p);
+      var pt = path.getPointAtLength(len * (ins + (1 - 2 * ins) * e));
+      pill.setAttribute('transform', 'translate(' + pt.x + ' ' + pt.y + ')');
+      pill.style.opacity = p < 0.1 ? String(p / 0.1) : (p > 0.9 ? String((1 - p) / 0.1) : '1');
+      if (p < 1) requestAnimationFrame(frame);
+      else { pill.style.opacity = '0'; if (done) done(); }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // one or more pills ride the same line, staggered; done fires after the last lands
+  function go(pathId, pills, dur, gap, inset, done){
+    var path = $(pathId);
+    path.classList.add('on');
+    pills.forEach(function(id, i){
+      later(i * gap, function(){
+        fly(pathId, id, dur, inset, i === pills.length - 1 ? function(){
+          path.classList.remove('on');
+          if (done) done();
+        } : null);
+      });
+    });
+  }
+
+  // Runtime tool -> registry bundle: leaves through the right edge of the Runtime tool (drawn on the top
+  // layer while it is over the Agent machine card), then drops under the cards once it has cleared the card
+  function flyBundle(dur, endInset, done){
+    var p1 = $('flow-prov-out'), p2 = $('flow-session-down'), pill = $('pill-prov'), tok = runToken;
+    if (!p1.getAttribute('d') || !p2.getAttribute('d')) { if (done) done(); return; }
+    var c = q('.canvas').getBoundingClientRect();
+    var card = q('[data-step="agent"] .base-node').getBoundingClientRect();
+    var L1 = p1.getTotalLength(), L2 = p2.getTotalLength(), total = L1 + L2;
+    var clearX = card.right - c.left + 80; // the pill is 152px wide, so its centre must clear the card
+    var top = true;
+    $('commitSvg').appendChild(pill);
+    var t0 = null;
+    function frame(now){
+      if (tok !== runToken) return;
+      if (t0 === null) t0 = now;
+      var t = now - t0, p = Math.min(t / dur, 1);
+      var e = 0.5 - 0.5 * Math.cos(Math.PI * p);
+      var s = (total - endInset) * e;
+      var pt = s < L1 ? p1.getPointAtLength(s) : p2.getPointAtLength(Math.min(L2, s - L1));
+      if (top && pt.x >= clearX) { $('apeSvg').appendChild(pill); top = false; }
+      pill.setAttribute('transform', 'translate(' + pt.x + ' ' + pt.y + ')');
+      pill.style.opacity = t < 90 ? String(t / 90) : (p > 0.9 ? String((1 - p) / 0.1) : '1');
+      if (p < 1) requestAnimationFrame(frame);
+      else { pill.style.opacity = '0'; if (done) done(); }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function resetState(){
+    allChips.forEach(function(c){ c.classList.remove('on', 'sent', 'ghost', 'fill', 'gcur', 'gread', 'gtop'); });
+    if (typeof gateEvs !== 'undefined' && gateEvs.length) gateEvs[0].classList.add('gtop');
+    policy.classList.remove('busy');
+    notary.classList.remove('busy');
+    policyRows.forEach(function(r){ r.chip.classList.remove('active'); });
+    spinners.forEach(function(s){ s.classList.remove('on'); });
+    gateCard.classList.remove('is-released');
+    gateBox.classList.remove('busy');
+    $('gatePass').classList.remove('on');
+    ALL_PILLS.forEach(function(id){ $(id).style.opacity = '0'; });
+    LINES.forEach(function(id){ $(id).classList.remove('on'); });
+  }
+
+  function showFinal(){
+    runToken += 1;
+    timers.forEach(window.clearTimeout); timers = [];
+    resetState();
+    allChips.forEach(function(c){ c.classList.add('on'); });
+    gateCard.classList.add('is-released');
+    $('gatePass').classList.add('on');
+  }
+
+  function cycle(){
+    runToken += 1;
+    timers.forEach(window.clearTimeout); timers = [];
+    resetState();
+
+    // 1. agent works (arrow spins only while it writes code) -> local commits, each next to its session log
+    agentSpin.classList.add('on');
+    // notary engine: once the last log has arrived it works for a moment, then emits provenance evidence
+    function notaryWorks(){
+      notary.classList.add('busy'); notarySpin.classList.add('on');
+      later(1100, function(){
+        notary.classList.remove('busy'); notarySpin.classList.remove('on');
+        nProvChip.classList.add('on');
+      });
+    }
+
+    var k = 0; // flat log index
+    [700, 2200, 3700].forEach(function(ms, i){
+      // logs are written first; the commit appears once its logs are in
+      later(ms + 500 + (logGroups[i].length - 1) * 150, function(){
+        commitChips[i].classList.add('on');
+        if (i > 0) commitChips[i - 1].classList.add('sent'); // the previous commit is no longer the one being written
+      });
+      logGroups[i].forEach(function(c, j){
+        var idx = k++;
+        var born = ms + j * 150;
+        later(born, function(){ c.classList.add('on'); });
+        // each log is handed to the notary engine right after it is written
+        later(born + 250, function(){
+          c.classList.add('sent');
+          if (idx === logChips.length - 1) agentSpin.classList.remove('on'); // agent has finished writing
+          fly('flow-n' + idx, NLOG_PILLS[idx], 650, 0, function(){
+            nLogChips[idx].classList.add('on'); // the pile grows by one
+            if (idx === logChips.length - 1) notaryWorks();
+          });
+        });
+      });
+    });
+
+    // 2. push last commit to source control; logs + provenance evidence go to the registry together
+    later(6600, function(){
+      commitChips[2].classList.add('sent');
+      nLogChips.forEach(function(lc){ lc.classList.add('sent'); }); nProvChip.classList.add('sent');
+      go('flow-commit', ['pill-commit'], 900, 0, 0, function(){
+        sourceChip.classList.add('on'); pulse(sourceCard);
+      });
+      $('flow-prov-out').classList.add('on'); // the line lights from the Runtime tool box down
+      $('flow-session-down').classList.add('on');
+      flyBundle(1900, 56, function(){
+        $('flow-session-down').classList.remove('on');
+        $('flow-prov-out').classList.remove('on');
+        shLogs.classList.add('on'); shProv.classList.add('on'); pulse(circle);
+      });
+    });
+
+    // 2b. source control passes the commit on to CICD, which starts generating the artifact
+    later(8100, function(){
+      sourceChip.classList.add('sent');
+      go('flow-commit2', ['pill-commit'], 900, 0, 0, function(){
+        remoteChip.classList.add('on'); pulse(remoteCard);
+        remoteSpin.classList.add('on'); // CICD working
+        startBuild();                   // artifact starts appearing in the card
+      });
+    });
+
+    // 3. logs wait in Artifactory, then go to the policy engine
+    later(10520, function(){
+      go('flow-policy-in', LOG_PILLS, 1700, 260, 14, function(){
+        policy.classList.add('busy');
+        // each policy evaluates in turn (working arrow) and then adds its own evidence
+        var STEP = 600;
+        policyRows.forEach(function(r, i){
+          later(i * STEP, function(){ r.chip.classList.add('active'); r.spin.classList.add('on'); });
+          later((i + 1) * STEP, function(){
+            r.chip.classList.remove('active'); r.spin.classList.remove('on');
+            r.ev.classList.add('on');
+          });
+        });
+        // 4. every policy has its evidence -> one evidence per policy goes back to the registry
+        later(policyRows.length * STEP + 300, function(){
+          policy.classList.remove('busy');
+          policyRows.forEach(function(r){ r.ev.classList.add('sent'); });
+          go('flow-evidence-back', EV_PILLS, 1800, 260, 14, function(){
+            shEv.classList.add('on'); pulse(circle);
+          });
+        });
+      });
+    });
+
+    // 5. artifact arrives from the source and lands next to logs + evidence
+    later(13575, function(){
+      remoteSpin.classList.remove('on'); // build done, artifact leaves (CICD works 4.6s)
+      remoteChip.classList.add('sent');  // the commit has done its job
+      endBuild();
+      go('flow-artifact', ['pill-artifact'], 1900, 0, 50, function(){
+        shArt.classList.add('on'); pulse(circle);
+      });
+    });
+
+    // 6. artifact and evidence leave the registry on their own lines and arrive at the gate together
+    later(18700, function(){
+      go('flow-artifact-up', ['pill-artifact'], 2100, 0, 18, null); // green line, the artifact
+      go('flow-evidence-up', ['pill-evidence-up'], 2100, 0, 18, function(){ // orange line, the evidence
+        // the Gate receives the process evidence and reads it
+        var READ = 550, T0 = 700;
+        gateBox.classList.add('busy'); gateSpin.classList.add('on');
+        gateEvs.forEach(function(g, i){
+          later((gateEvs.length - 1 - i) * 120, function(){ g.classList.add('on'); }); // back of the stack lands first
+          later(T0 + i * READ, function(){ g.classList.add('gcur'); });
+          later(T0 + (i + 1) * READ - 60, function(){ g.classList.remove('gcur'); g.classList.add('gread'); if (gateEvs[i + 1]) gateEvs[i + 1].classList.add('gtop'); });
+        });
+        // once it has read them all it puts the artifact into the deployment
+        later(T0 + gateEvs.length * READ + 200, function(){
+          gateBox.classList.remove('busy'); gateSpin.classList.remove('on');
+          $('gatePass').classList.add('on');
+          gateArt.classList.add('on');
+          gateCard.classList.add('is-released');
+        });
+      });
+    });
+
+    // loop
+    later(26200, cycle);
+  }
+
+  /* ---------- layout of flow lines ---------- */
+  function bezier(x1, y1, x2, y2, c1x, c1y, c2x, c2y){
+    return 'M ' + x1 + ' ' + y1 +
+      ' C ' + c1x + ' ' + c1y + ', ' + c2x + ' ' + c2y + ', ' + x2 + ' ' + y2;
+  }
+
+  function place(id, d){
+    $(id).setAttribute('d', d);
+  }
+
+  function layoutCommit(){
+    var svg = $('commitSvg');
+    var canvas = q('.canvas');
+    var c = canvas.getBoundingClientRect();
+    if (c.width < 40) return;
+    svg.setAttribute('viewBox', '0 0 ' + c.width + ' ' + c.height);
+    var agent = q('[data-step="agent"]').getBoundingClientRect();
+    var src = q('[data-step="source"]').getBoundingClientRect();
+    var next = q('[data-step="pr"]').getBoundingClientRect();
+    var aw = $('agentWork').getBoundingClientRect(); // the commit leaves from the Agent work box
+    var y = aw.top + aw.height / 2 - c.top;
+    // logs -> runtime tool: short guide paths inside the Agent machine card, each to its own slot in the pile
+    logChips.forEach(function(el, i){
+      var r = el.getBoundingClientRect();
+      var nt = nLogChips[i].getBoundingClientRect();
+      var tx = nt.left + nt.width / 2 - c.left, ty = nt.top + nt.height / 2 - c.top;
+      if (!$('flow-n' + i)) return;
+      place('flow-n' + i, 'M ' + (r.left + r.width / 2 - c.left) + ' ' + (r.top + r.height / 2 - c.top) +
+        ' L ' + tx + ' ' + ty);
+    });
+    // Runtime tool -> registry line: first stretch, straight out of the Runtime tool's right edge, past the card
+    var agentCard = q('[data-step="agent"] .base-node').getBoundingClientRect();
+    var rtBox = $('notary').getBoundingClientRect();
+    var rtMidY = rtBox.top + rtBox.height / 2 - c.top;
+    place('flow-prov-out', 'M ' + (rtBox.right - c.left) + ' ' + rtMidY +
+      ' L ' + (agentCard.right - c.left + 6) + ' ' + rtMidY);
+    // agent -> source control, then source control -> CICD
+    var a1 = aw.right - c.left, a2 = src.left - c.left;
+    var b1 = src.right - c.left, b2 = next.left - c.left;
+    if (a2 - a1 < 24 || b2 - b1 < 24) return;
+    place('flow-commit', 'M ' + a1 + ' ' + y + ' L ' + a2 + ' ' + y);
+    place('flow-commit2', 'M ' + b1 + ' ' + y + ' L ' + b2 + ' ' + y);
+  }
+
+  function layoutArrows(){
+    var svg = $('apeSvg');
+    var canvas = q('.canvas');
+    var c = canvas.getBoundingClientRect();
+    var circleBox = circle.getBoundingClientRect();
+    if (c.width < 40 || circleBox.height < 8) return;
+    svg.setAttribute('viewBox', '0 0 ' + c.width + ' ' + c.height);
+
+    function foot(name, dx){
+      var r = q('[data-step="' + name + '"]').getBoundingClientRect();
+      return { x: r.left + r.width / 2 - c.left + (dx || 0), y: r.bottom - c.top + 2 };
+    }
+    var cx = circleBox.left + circleBox.width / 2 - c.left;
+    var cy = circleBox.top + circleBox.height / 2 - c.top;
+    var rad = circleBox.width / 2 + 5;
+    function rim(deg){
+      var a = deg * Math.PI / 180;
+      return { x: cx + Math.cos(a) * rad, y: cy + Math.sin(a) * rad };
+    }
+    function beyond(pt, extra){
+      var dx = pt.x - cx, dy = pt.y - cy;
+      var len = Math.sqrt(dx * dx + dy * dy) || 1;
+      return { x: cx + dx / len * (len + extra), y: cy + dy / len * (len + extra) };
+    }
+    var gateRect = $('gateBox').getBoundingClientRect(); // the registry line ends on the Gate's bottom edge
+    var gate = { x: gateRect.left + gateRect.width / 2 - c.left, y: gateRect.bottom - c.top };
+    var prGive = foot('pr', -6);
+    var artIn = rim(-84); // left of the two lines that leave for the Gate
+    var sessIn = rim(-128);
+    var polIn = rim(-163);
+    var backOut = rim(163);
+    var pe = policy.getBoundingClientRect();
+    var peRight = { x: pe.right - c.left + 2, y: pe.top + pe.height / 2 - c.top };
+    var sessInBend = beyond(sessIn, 46);
+
+    // continues the line that left the Runtime tool's right edge, then bends down into the registry
+    var rtBox = $('notary').getBoundingClientRect();
+    var agentCard = q('[data-step="agent"] .base-node').getBoundingClientRect();
+    var leaveX = agentCard.right - c.left + 6;
+    var leaveY = rtBox.top + rtBox.height / 2 - c.top;
+    place('flow-session-down', bezier(
+      leaveX, leaveY, sessIn.x, sessIn.y,
+      leaveX + 90, leaveY,
+      sessInBend.x - 8, sessInBend.y
+    ));
+    if (phase >= 5) {
+      place('flow-policy-in', bezier(
+        polIn.x, polIn.y, peRight.x, peRight.y - 20,
+        polIn.x - 60, polIn.y,
+        peRight.x + 60, peRight.y - 20
+      ));
+      place('flow-artifact', bezier(
+        prGive.x, prGive.y, artIn.x, artIn.y,
+        prGive.x, prGive.y + 60,
+        artIn.x + 10, artIn.y - 40
+      ));
+      place('flow-evidence-back', bezier(
+        peRight.x, peRight.y + 20, backOut.x, backOut.y,
+        peRight.x + 60, peRight.y + 20,
+        backOut.x - 60, backOut.y
+      ));
+      // two parallel lines to the Gate: each starts exactly on the circle's edge and ends exactly on the Gate's bottom edge
+      // (starts sit above the registry's contents card, which covers the circle's right edge)
+      var edgeR = circleBox.width / 2;
+      function upLine(id, deg, dx){
+        var a = deg * Math.PI / 180;
+        var sx = cx + Math.cos(a) * edgeR, sy = cy + Math.sin(a) * edgeR;
+        var ex = gate.x + dx, ey = gate.y;
+        place(id, bezier(sx, sy, ex, ey, sx + Math.cos(a) * 90, sy + Math.sin(a) * 90, ex, ey + 115));
+      }
+      upLine('flow-artifact-up', -66, -11); // green, the artifact
+      upLine('flow-evidence-up', -50, 11);  // orange, the evidence
+    } else {
+      ['flow-artifact','flow-policy-in','flow-evidence-back','flow-artifact-up','flow-evidence-up'].forEach(function(id){
+        $(id).removeAttribute('d');
+      });
+    }
+  }
+
+  function relayout(){
+    layoutCommit();
+    layoutArrows();
+  }
+
+  function startOnce(){
+    if (started) return;
+    started = true;
+    if (reduced) showFinal(); else cycle();
+  }
+
+  function scheduleLayout(){
+    window.clearTimeout(layoutTimer);
+    layoutTimer = window.setTimeout(function(){
+      relayout();
+      startOnce();
+    }, 80);
+  }
+
+  function render(){
+    deck.classList.remove('phase-1','phase-2','phase-3','phase-4','phase-5','show-steps','show-providers','show-shelf','show-session','show-evidence');
+    deck.classList.add('phase-' + phase);
+    if (phase >= 2) deck.classList.add('show-steps');
+    if (phase >= 3) deck.classList.add('show-providers');
+    if (phase >= 4) deck.classList.add('show-shelf');
+    if (phase >= 5) deck.classList.add('show-session','show-evidence');
+    deck.querySelector('.registry-wrap').setAttribute('aria-hidden', phase >= 4 ? 'false' : 'true');
+    $('apeSvg').setAttribute('aria-hidden', phase >= 5 ? 'false' : 'true');
+    if (phase >= 5) scheduleLayout();
+  }
+
+  window.addEventListener('resize', relayout);
+  window.addEventListener('load', scheduleLayout);
+
+  // Open directly on the end-state layout (no build-up), then loop the process forever.
+  document.documentElement.classList.add('snap');
+  phase = 5;
+  render();
+  if (!reduced) {
+    window.setTimeout(function(){
+      document.documentElement.classList.remove('snap');
+    }, 50);
+  }
+})();
+</script>
+</body>
+</html>
