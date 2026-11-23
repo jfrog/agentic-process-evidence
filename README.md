@@ -7,6 +7,10 @@ This repository defines how to bind agent session information to SDLC entities (
 
 Entity definitions live under [spec/](./spec/).
 
+![Agentic Process Evidence across an SDLC](docs/diagrams/sdlc-with-ape.gif)
+
+*One pass of agentic work through an SDLC: commits, session logs, provenance, policy checks, and the release gate. Source: [sdlc-with-ape.html](docs/diagrams/sdlc-with-ape.html).*
+
 ## Why this exists
 
 Agentic tools (IDE agents, review bots, release assistants) change code and influence releases, but their provenance is often invisible to governance, auditors, and policy engines. 
@@ -173,7 +177,13 @@ How existing tools produce or consume the entities of this standard.
 2. **Instrument the runtime** - Ensure the agent harness emits a session timeline (hooks or equivalent) and the Agent runtime tool flushes logs + evidence appropriately (e.g. on commit for development process).
 3. **Store session logs** - Persist the session logs and enable minimal searchable attributes (`tools`, `agent`, `commit`, `sessionId`) so you can find all sessions that used a compromised tool or flagged policy issue.
 4. **Publish AI Process evidence** - Sign and attach the [in-toto](https://github.com/in-toto/in-toto) statement to the commit.
-5. **Create policy-as-code** - Whitelist harnesses, agents, LLMs; require owners/reviewers; gate on `result` and alignment verdicts.
+5. **Create policy-as-code** - Whitelist harnesses, agents, LLMs; require owners/reviewers; gate on `result` and alignment verdicts. Examples of policies the evidence is checked against:
+
+   - No changing public APIs
+   - Match the agent's work to the ticket specification
+   - Stay inside the files the ticket names
+   - Don't add a dependency that is not already approved
+   - Don't weaken authentication or authorization
 6. **Route exceptions to humans** - Use `reviewers`, and when available `intents` and `processSummary`, and session log URIs for rapid approval when policy cannot decide.
 7. **Retain** - Keep session logs and evidence at least as long as release is relevant.
 
@@ -211,6 +221,8 @@ How existing tools produce or consume the entities of this standard.
 | Path                       | Description                                                                               |
 | -------------------------- | ----------------------------------------------------------------------------------------- |
 | [spec/](./spec/)         | session log, agentic process evidence, agent identifier, alignment evidence, runtime tool |
+| [docs/diagrams/sdlc-with-ape.gif](./docs/diagrams/sdlc-with-ape.gif) | Animated SDLC walkthrough shown at the top of this page |
+| [docs/diagrams/sdlc-with-ape.html](./docs/diagrams/sdlc-with-ape.html) | Source of that animation. Open the file in a browser to play it. |
 | [README.md](./README.md) | Orientation and adoption guide (this file)                                                |
 | [integrations/](./integrations/) | How existing tools produce or consume these entities (mapping, examples, verification) |
 
